@@ -20,11 +20,11 @@ public class TestSignup {
     @DataProvider(name = SIGNUP_PAYLOAD)
     public Object[][] data() {
         return new Object[][]{
-                {testcases.SignupTestcases.signup_001(), 200, "Please verify user - Email Sent to registered email"}, // valid email, fullName, password -> Please verify user - Email Sent to registered email
-                {testcases.SignupTestcases.signup_002(), 400, "User already signed up"}, // signup with an existing emails -> User already signed up
-                {testcases.SignupTestcases.signup_003(), 400, "OOPS SOMETHING WENT WRONG"}, // signup with invalid email format -> OOPS SOMETHING WENT WRONG
-                {testcases.SignupTestcases.signup_004(), 400, "Invalid password format"}, // signup with weak password regex -> Invalid password format
-                {testcases.SignupTestcases.signup_005(), 400, "Invalid password format"}, // signup with all empty -> Invalid password format
+                {testcases.SignupTestcases.signup_001(), 200, "Please verify user - Email Sent to registered email"}, // valid email, fullName, password
+                {testcases.SignupTestcases.signup_002(), 400, "User already signed up"}, // signup with an existing emails
+                {testcases.SignupTestcases.signup_003(), 400, "OOPS SOMETHING WENT WRONG"}, // signup with invalid email format
+                {testcases.SignupTestcases.signup_004(), 400, "Invalid password format"}, // signup with weak password regex
+                {testcases.SignupTestcases.signup_005(), 400, "Invalid password format"}, // signup with all empty
                 {testcases.SignupTestcases.signup_006(), 400, "Oops Something went Wrong!"},//signup with empty email
                 {testcases.SignupTestcases.signup_007(), 400, "Invalid password format"}, // signup with empty password
                 {testcases.SignupTestcases.signup_008(), 400, "Oops Something went Wrong!"}, // signup with empty name
