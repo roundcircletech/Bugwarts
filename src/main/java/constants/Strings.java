@@ -17,6 +17,10 @@ public class Strings {
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String CONTENT_TYPE_JSON = "application/json";
     public static final String CONTENT_TYPE_TEXT = "text/plain";
+    public static final String ACCEPT = "Accept";
     public static final String CONTAINS_SPECIAL_CHARACTERS = "@test";
+    public static final String ANONYMOUS_V2_PAYLOAD = "anonymousV2Payload";
+    public static final String ANONYMOUS_V2_ACCEPT = "application/json, text/plain, */*";
+    public static final String SESSION_ID = "sessionId";
 
 }
