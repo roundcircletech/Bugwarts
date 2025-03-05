@@ -8,9 +8,7 @@ import static files.Payload.generateLoginPayload;
 public class LoginTestcases {
 
     // Valid Login
-    public static String login_001() {
-        return generateLoginPayload(EXISTING_EMAIL, EXISTING_PASSWORD);
-    }
+    public static String login_001() {return generateLoginPayload(EXISTING_EMAIL, EXISTING_PASSWORD);}
 
     // Empty both -> {"message":"Invalid credentials"}
     public static String login_002() {

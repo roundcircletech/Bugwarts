@@ -14,4 +14,8 @@ public class ReusableMethods {
         return TEST_NAME + UUID.randomUUID().toString().substring(0, 8) + TEST_DOMAIN;
     }
 
+    public static UUID sessionId() {
+        return UUID.randomUUID();
+    }
+
 }
