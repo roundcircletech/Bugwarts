@@ -8,6 +8,7 @@ import org.testng.annotations.Test;
 import testcases.InviteUserTestCases;
 
 import static constants.DataProviders.INVITE_DATA;
+import static constants.Headers.X_AUTH;
 import static constants.Strings.AUTH_TOKEN;
 import static constants.Urls.*;
 import static io.restassured.RestAssured.given;
@@ -36,7 +37,7 @@ public class TestInviteUser {
         given()
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
-                .header("x-auth", AUTH_TOKEN)
+                .header(X_AUTH, AUTH_TOKEN)
                 .body(payload)
                 .when()
                 .post(INVITE_USER_URL)

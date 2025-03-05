@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import org.testng.annotations.*;
 import testcases.AnonymousV2Testcases;
 
+import static constants.DataProviders.ANONYMOUS_V2_PAYLOAD;
 import static constants.Headers.*;
 import static constants.Strings.*;
 import static constants.Urls.*;

@@ -5,4 +5,5 @@ public class Headers {
     public static final String CONTENT_TYPE_JSON = "application/json";
     public static final String CONTENT_TYPE_TEXT = "text/plain";
     public static final String CONTENT_TYPE = "Content-Type";
+    public static final String X_AUTH = "x-auth";
 }

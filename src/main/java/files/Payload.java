@@ -3,6 +3,7 @@ package files;
 import org.json.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -39,7 +40,7 @@ public class Payload {
     public static String generateInviteUserPayload(String recipient, String inviteType, String action) {
         try {
             Map<String, Object> payload = new HashMap<>();
-            payload.put(RECIPIENT, recipient);
+            payload.put(RECIPIENT, List.of(recipient));
             payload.put(INVITE_TYPE, inviteType);
             payload.put(ACTION, action);
 

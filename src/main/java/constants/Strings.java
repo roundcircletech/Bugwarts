@@ -13,7 +13,6 @@ public class Strings {
     public static final String TEST_NAME = "Test";
     public static final String TWO_CHARACTERS = "ab";
     public static final String CONTAINS_SPECIAL_CHARACTERS = "@test";
-    public static final String ANONYMOUS_V2_PAYLOAD = "anonymousV2Payload";
     public static final String ANONYMOUS_V2_ACCEPT = "application/json, text/plain, */*";
     public static final String SESSION_ID = "sessionId";
     public static final String AUTH_TOKEN = "Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlYWY2NDExNS0zOTk2LTRlNzYtOWFjNC0wZjZlY2M2MzVmODQiLCJyZWFsbSI6Ijc0MGJjNzUxLWExYjUtNDhiZS04NTliLWU3N2QyNWM4ODRiZSIsImV4cCI6MTc0MTI0MTU0MH0.to1fr1Ka9b7zXVPL6EX8LQw_-n1Mlo57GBol1zK-xmWA4K-1IQ2KnnmFgKLOjq-_XfqfToztpuJMtuFDf5sPLw";
