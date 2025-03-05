@@ -6,8 +6,11 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import static constants.DataProviders.SIGNUP_PAYLOAD;
+import static constants.Headers.*;
 import static constants.Strings.*;
 import static constants.Urls.*;
+
 import static io.restassured.RestAssured.given;
 
 public class TestSignup {

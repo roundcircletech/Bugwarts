@@ -1,10 +1,13 @@
 package files;
 
 import org.json.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
-import static constants.Strings.EMPTY_STRING;
-import static constants.Strings.SESSION_ID;
+import static constants.ErrorStrings.INVITE_USER_PAYLOAD_ERROR;
+import static constants.Strings.*;
 
 public class Payload {
 
@@ -33,6 +36,17 @@ public class Payload {
         else return EMPTY_STRING;
     }
 
+    public static String generateInviteUserPayload(String recipient, String inviteType, String action) {
+        try {
+            Map<String, Object> payload = new HashMap<>();
+            payload.put(RECIPIENT, recipient);
+            payload.put(INVITE_TYPE, inviteType);
+            payload.put(ACTION, action);
 
-
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.writeValueAsString(payload);  // Convert map to JSON string
+        } catch (Exception e) {
+            throw new RuntimeException(INVITE_USER_PAYLOAD_ERROR, e);
+        }
+    }
 }

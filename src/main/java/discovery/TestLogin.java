@@ -6,8 +6,10 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import testcases.LoginTestcases;
 
-import static constants.Strings.*;
+import static constants.DataProviders.LOGIN_PAYLOAD;
+import static constants.Headers.*;
 import static constants.Urls.*;
+
 import static io.restassured.RestAssured.*;
 
 public class TestLogin {

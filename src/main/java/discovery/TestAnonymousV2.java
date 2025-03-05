@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import org.testng.annotations.*;
 import testcases.AnonymousV2Testcases;
 
+import static constants.Headers.*;
 import static constants.Strings.*;
 import static constants.Urls.*;
 import static io.restassured.RestAssured.given;
