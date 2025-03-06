@@ -2,12 +2,9 @@ package files;
 
 import org.json.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
-import static constants.ErrorStrings.INVITE_USER_PAYLOAD_ERROR;
+import static constants.ErrorStrings.*;
 import static constants.Strings.*;
 
 public class Payload {
@@ -50,4 +47,19 @@ public class Payload {
             throw new RuntimeException(INVITE_USER_PAYLOAD_ERROR, e);
         }
     }
+
+    public static String generateFeedbackPayload(String conversationId, String status, String comment) {
+        try {
+            Map<String, Object> payload = new HashMap<>();
+            payload.put(CONVERSATION_ID, conversationId);
+            payload.put(STATUS, status);
+            payload.put(COMMENT, comment);
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.writeValueAsString(payload);  // Convert map to JSON string
+        } catch (Exception e) {
+            throw new RuntimeException(FEEDBACK_PAYLOAD_ERROR, e);
+        }
+    }
+
 }
