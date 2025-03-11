@@ -19,5 +19,12 @@ public class Strings {
     public static final String RECIPIENT = "recipient";
     public static final String INVITE_TYPE = "inviteType";
     public static final String ACTION = "action";
-
+    public static final String STATUS = "status";
+    public static final String CONVERSATION_ID = "conversationId";
+    public static final String COMMENT = "comment";
+    public static final String VALID_CONVERSATION_ID = "c9c082ac-6106-478c-8428-e0ecbdc74510";
+    public static final String INVALID_CONVERSATION_ID = "invalid-convo-id";
+    public static final String NON_EXISTENT_CONVERSATION_ID = "123e4567-e89b-12d3-a456-426614174999";
+    public static final String LIKE = "LIKE";
+    public static final String INVALID_STATUS = "INVALID_STATUS";
 }
