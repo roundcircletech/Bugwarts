@@ -62,4 +62,25 @@ public class Payload {
         }
     }
 
+    public static String generateBookDemoPayload(String conversationId, String toolName, String source,
+                                                 String name, String email, String startTime,
+                                                 String endTime, String phone) {
+        try {
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("conversationId", conversationId);
+            payload.put("toolName", toolName);
+            payload.put("source", source);
+            payload.put("name", name);
+            payload.put("email", email);
+            payload.put("startTime", startTime);
+            payload.put("endTime", endTime);
+            payload.put("phone", phone);
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.writeValueAsString(payload);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error generating Book Demo payload", e);
+        }
+    }
 }

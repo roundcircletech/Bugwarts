@@ -8,4 +8,5 @@ public class Urls {
     public static final String ANONYMOUS_V2 = "api/v1/auth/anonymous/v2";
     public static final String INVITE_USER_URL = "api/v1/conversation/7320464c-6406-4655-8abf-546fc31f163b/invite";
     public static final String FEEDBACK_URL = "api/v1/message/%s/feedback";
+    public static final String BOOK_DEMO_URL = BASE_URL + "/conversation/%s/demo/book";
 }
