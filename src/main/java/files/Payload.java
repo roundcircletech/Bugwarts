@@ -1,65 +1,21 @@
 package files;
 
 import org.json.JSONObject;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.*;
 
-import static constants.ErrorStrings.*;
+import static constants.Headers.*;
 import static constants.Strings.*;
 
 public class Payload {
-
-    public static String generateSignUpPayload(String email, String password, String name) {
-        return "{\n"
-                + "    \"email\" : \"" + email + "\",\n"
-                + "    \"password\" : \"" + password + "\",\n"
-                + "    \"name\" : \"" + name + "\"\n"
-                + "}";
-    }
-
-    public static String generateLoginPayload(String email, String password) {
-        return "{\n"
-                + "    \"email\" : \"" + email + "\",\n"
-                + "    \"password\" : \"" + password + "\",\n"
-                + "    \"sessionId\" : \"" + ReusableMethods.sessionId() + "\"\n"
-                + "}";
-    }
-
-    public static String generateAnonymousV2Payload(UUID sessionId){
-        if(sessionId != null) {
+    public static String generatePreviewPayload(UUID clientId, String origin, String referer){
+        if(clientId != null) {
             JSONObject requestBody = new JSONObject();
-            requestBody.put(SESSION_ID, sessionId.toString());
+            requestBody.put(CLIENT_ID, clientId.toString());
+            requestBody.put(ORIGIN, origin);
+            requestBody.put(REFERER, referer);
             return requestBody.toString();
         }
         else return EMPTY_STRING;
-    }
-
-    public static String generateInviteUserPayload(String recipient, String inviteType, String action) {
-        try {
-            Map<String, Object> payload = new HashMap<>();
-            payload.put(RECIPIENT, List.of(recipient));
-            payload.put(INVITE_TYPE, inviteType);
-            payload.put(ACTION, action);
-
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.writeValueAsString(payload);  // Convert map to JSON string
-        } catch (Exception e) {
-            throw new RuntimeException(INVITE_USER_PAYLOAD_ERROR, e);
-        }
-    }
-
-    public static String generateFeedbackPayload(String conversationId, String status, String comment) {
-        try {
-            Map<String, Object> payload = new HashMap<>();
-            payload.put(CONVERSATION_ID, conversationId);
-            payload.put(STATUS, status);
-            payload.put(COMMENT, comment);
-
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.writeValueAsString(payload);  // Convert map to JSON string
-        } catch (Exception e) {
-            throw new RuntimeException(FEEDBACK_PAYLOAD_ERROR, e);
-        }
     }
 
 }
