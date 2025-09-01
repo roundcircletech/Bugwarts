@@ -48,15 +48,13 @@ public class ChatBotExcelTest {
 		System.out.println(result);
 		WebElement shadowHost = driver.findElement(By.cssSelector(MY_COMPONENT));
 		shadowHost.getShadowRoot();
-
+		chatActions.clickChatBot(urls,shadowHost.getShadowRoot(),SDK_CHAT); //opening sdk
+		chatActions.expandChatBot(shadowHost.getShadowRoot(), SDK_EXPAND_BUTTON); //for expanding sdk
 		int suggestions = chatActions.getDefaultSuggestionsCount(shadowHost.getShadowRoot());
 		Assert.assertEquals(suggestions, 3, "Suggestions mismatch for " + urls);
-
+		chatActions.scheduleMeeting(shadowHost.getShadowRoot(), SCHEDULE_BUTTON); // scheduling a meeting
 		chatActions.getLastReply(driver, shadowHost.getShadowRoot());
 		chatActions.greetingReply(shadowHost.getShadowRoot());
-		chatActions.expandChatBot(shadowHost.getShadowRoot(), SDK_EXPAND_BUTTON); //for expanding sdk
-		chatActions.clickChatBot(urls,shadowHost.getShadowRoot(),SDK_CHAT); //opening sdk
-		chatActions.scheduleMeeting(shadowHost.getShadowRoot(), SCHEDULE_BUTTON); // scheduling a meeting
 		chatActions.closeChatBot(shadowHost.getShadowRoot(), SDK_CLOSE_BUTTON); //closing sdk
 	}
 }
