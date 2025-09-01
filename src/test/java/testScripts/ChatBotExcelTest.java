@@ -54,9 +54,6 @@ public class ChatBotExcelTest {
 
 		chatActions.getLastReply(driver, shadowHost.getShadowRoot());
 		chatActions.greetingReply(shadowHost.getShadowRoot());
-
-
-
 		chatActions.expandChatBot(shadowHost.getShadowRoot(), SDK_EXPAND_BUTTON); //for expanding sdk
 		chatActions.clickChatBot(urls,shadowHost.getShadowRoot(),SDK_CHAT); //opening sdk
 		chatActions.scheduleMeeting(shadowHost.getShadowRoot(), SCHEDULE_BUTTON); // scheduling a meeting

@@ -58,7 +58,7 @@ public class chatActions {
             List<WebElement> items = (shadowRoot.findElements(By.cssSelector(SUGGESTIVE_QUESTIONS_CONTAINER)));
 
             System.out.println("Found " + (shadowRoot.findElements(By.cssSelector(SUGGESTIVE_QUESTIONS_CONTAINER))).size() + " for suggestive responses");
-            return (shadowRoot.findElements(By.cssSelector(SUGGESTIVE_QUESTIONS_CONTAINER))).size()
+            return (shadowRoot.findElements(By.cssSelector(SUGGESTIVE_QUESTIONS_CONTAINER))).size();
         } catch (Exception e) {
             System.out.println("Couldn't count suggestions: " + e.getMessage());
             return 0;
