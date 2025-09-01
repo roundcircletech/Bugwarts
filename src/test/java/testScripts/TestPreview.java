@@ -1,4 +1,4 @@
-package discovery;
+package testScripts;
 
 import io.restassured.RestAssured;
 import org.json.JSONObject;

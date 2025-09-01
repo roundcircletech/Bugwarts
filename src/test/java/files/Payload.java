@@ -17,5 +17,4 @@ public class Payload {
         }
         else return EMPTY_STRING;
     }
-
 }

@@ -3,13 +3,13 @@
 <suite name="Failed suite [Suite]" guice-stage="DEVELOPMENT">
   <test thread-count="5" name="Test(failed)">
     <classes>
-      <class name="chatbot.ai.ChatBotExcelTest">
+      <class name="testScripts.ChatBotExcelTest">
         <methods>
           <include name="setUp"/>
           <include name="tearDown"/>
           <include name="testSites" invocation-numbers="0 1 2"/>
         </methods>
-      </class> <!-- chatbot.ai.ChatBotExcelTest -->
+      </class> <!-- testScripts.ChatBotExcelTest -->
     </classes>
   </test> <!-- Test(failed) -->
 </suite> <!-- Failed suite [Suite] -->

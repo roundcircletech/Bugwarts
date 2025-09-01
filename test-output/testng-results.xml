@@ -6,12 +6,12 @@
     <groups>
     </groups>
     <test started-at="2025-08-28T12:24:33 IST" name="Test" finished-at="2025-08-28T12:26:24 IST" duration-ms="111318">
-      <class name="chatbot.ai.ChatBotExcelTest">
-        <test-method is-config="true" signature="setUp()[pri:0, instance:chatbot.ai.ChatBotExcelTest@6adbc9d]" started-at="2025-08-28T12:24:34 IST" name="setUp" finished-at="2025-08-28T12:24:36 IST" duration-ms="2473" status="PASS">
+      <class name="testScripts.ChatBotExcelTest">
+        <test-method is-config="true" signature="setUp()[pri:0, instance:testScripts.ChatBotExcelTest@6adbc9d]" started-at="2025-08-28T12:24:34 IST" name="setUp" finished-at="2025-08-28T12:24:36 IST" duration-ms="2473" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- setUp -->
-        <test-method signature="testSites(java.lang.String)[pri:2, instance:chatbot.ai.ChatBotExcelTest@6adbc9d]" started-at="2025-08-28T12:24:36 IST" name="testSites" data-provider="chatbotUrls" finished-at="2025-08-28T12:24:58 IST" duration-ms="21711" status="PASS">
+        <test-method signature="testSites(java.lang.String)[pri:2, instance:testScripts.ChatBotExcelTest@6adbc9d]" started-at="2025-08-28T12:24:36 IST" name="testSites" data-provider="chatbotUrls" finished-at="2025-08-28T12:24:58 IST" duration-ms="21711" status="PASS">
           <params>
             <param index="0">
               <value>
@@ -22,15 +22,15 @@
           <reporter-output>
           </reporter-output>
         </test-method> <!-- testSites -->
-        <test-method is-config="true" signature="tearDown()[pri:0, instance:chatbot.ai.ChatBotExcelTest@6adbc9d]" started-at="2025-08-28T12:24:58 IST" name="tearDown" finished-at="2025-08-28T12:24:58 IST" duration-ms="292" status="PASS">
+        <test-method is-config="true" signature="tearDown()[pri:0, instance:testScripts.ChatBotExcelTest@6adbc9d]" started-at="2025-08-28T12:24:58 IST" name="tearDown" finished-at="2025-08-28T12:24:58 IST" duration-ms="292" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- tearDown -->
-        <test-method is-config="true" signature="setUp()[pri:0, instance:chatbot.ai.ChatBotExcelTest@6adbc9d]" started-at="2025-08-28T12:24:58 IST" name="setUp" finished-at="2025-08-28T12:25:00 IST" duration-ms="1882" status="PASS">
+        <test-method is-config="true" signature="setUp()[pri:0, instance:testScripts.ChatBotExcelTest@6adbc9d]" started-at="2025-08-28T12:24:58 IST" name="setUp" finished-at="2025-08-28T12:25:00 IST" duration-ms="1882" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- setUp -->
-        <test-method signature="testSites(java.lang.String)[pri:2, instance:chatbot.ai.ChatBotExcelTest@6adbc9d]" started-at="2025-08-28T12:25:00 IST" name="testSites" data-provider="chatbotUrls" finished-at="2025-08-28T12:25:42 IST" duration-ms="41637" status="PASS">
+        <test-method signature="testSites(java.lang.String)[pri:2, instance:testScripts.ChatBotExcelTest@6adbc9d]" started-at="2025-08-28T12:25:00 IST" name="testSites" data-provider="chatbotUrls" finished-at="2025-08-28T12:25:42 IST" duration-ms="41637" status="PASS">
           <params>
             <param index="0">
               <value>
@@ -41,15 +41,15 @@
           <reporter-output>
           </reporter-output>
         </test-method> <!-- testSites -->
-        <test-method is-config="true" signature="tearDown()[pri:0, instance:chatbot.ai.ChatBotExcelTest@6adbc9d]" started-at="2025-08-28T12:25:42 IST" name="tearDown" finished-at="2025-08-28T12:25:42 IST" duration-ms="198" status="PASS">
+        <test-method is-config="true" signature="tearDown()[pri:0, instance:testScripts.ChatBotExcelTest@6adbc9d]" started-at="2025-08-28T12:25:42 IST" name="tearDown" finished-at="2025-08-28T12:25:42 IST" duration-ms="198" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- tearDown -->
-        <test-method is-config="true" signature="setUp()[pri:0, instance:chatbot.ai.ChatBotExcelTest@6adbc9d]" started-at="2025-08-28T12:25:42 IST" name="setUp" finished-at="2025-08-28T12:25:44 IST" duration-ms="1888" status="PASS">
+        <test-method is-config="true" signature="setUp()[pri:0, instance:testScripts.ChatBotExcelTest@6adbc9d]" started-at="2025-08-28T12:25:42 IST" name="setUp" finished-at="2025-08-28T12:25:44 IST" duration-ms="1888" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- setUp -->
-        <test-method signature="testSites(java.lang.String)[pri:2, instance:chatbot.ai.ChatBotExcelTest@6adbc9d]" started-at="2025-08-28T12:25:44 IST" name="testSites" data-provider="chatbotUrls" finished-at="2025-08-28T12:26:24 IST" duration-ms="40402" status="PASS">
+        <test-method signature="testSites(java.lang.String)[pri:2, instance:testScripts.ChatBotExcelTest@6adbc9d]" started-at="2025-08-28T12:25:44 IST" name="testSites" data-provider="chatbotUrls" finished-at="2025-08-28T12:26:24 IST" duration-ms="40402" status="PASS">
           <params>
             <param index="0">
               <value>
@@ -60,11 +60,11 @@
           <reporter-output>
           </reporter-output>
         </test-method> <!-- testSites -->
-        <test-method is-config="true" signature="tearDown()[pri:0, instance:chatbot.ai.ChatBotExcelTest@6adbc9d]" started-at="2025-08-28T12:26:24 IST" name="tearDown" finished-at="2025-08-28T12:26:24 IST" duration-ms="192" status="PASS">
+        <test-method is-config="true" signature="tearDown()[pri:0, instance:testScripts.ChatBotExcelTest@6adbc9d]" started-at="2025-08-28T12:26:24 IST" name="tearDown" finished-at="2025-08-28T12:26:24 IST" duration-ms="192" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- tearDown -->
-      </class> <!-- chatbot.ai.ChatBotExcelTest -->
+      </class> <!-- testScripts.ChatBotExcelTest -->
     </test> <!-- Test -->
   </suite> <!-- Suite -->
 </testng-results>

@@ -1,6 +1,7 @@
 package constants;
 
 public class Headers {
+
     public static final String ACCEPT = "accept";
     public static final String ORIGIN = "origin";
     public static final String REFERER = "referer";

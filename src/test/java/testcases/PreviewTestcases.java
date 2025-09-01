@@ -1,16 +1,17 @@
 package testcases;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+
+import java.util.*;
 import com.opencsv.CSVReader;
 import java.io.FileReader;
+
+import static constants.Urls.CLIENT_DETAILS_CSV;
 import static files.Payload.generatePreviewPayload;
 public class PreviewTestcases {
 
     public static List<String> getAllPreviewPayloads() throws Exception {
         List<String> payloads = new ArrayList<>();
 
-        try (CSVReader reader = new CSVReader(new FileReader("src/test/resources/clientDetails.csv"))) {
+        try (CSVReader reader = new CSVReader(new FileReader(CLIENT_DETAILS_CSV))) {
             String[] nextLine;
             reader.readNext();
 
@@ -24,4 +25,5 @@ public class PreviewTestcases {
             }
         }
         return payloads;
-    }}
+    }
+}
