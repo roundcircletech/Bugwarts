@@ -3,190 +3,224 @@ package chatbot.ai;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import static org.testng.Assert.assertTrue;
+
 import java.time.Duration;
 import java.util.List;
 
-import static org.testng.Assert.assertTrue;
-
 public class ChatBotActions {
 
-	// Handle cookie banners if they appear on the site
-	public static void handleCookiesIfPresent(WebDriver driver) {
-		try {
-			// Try to find "Decline" button
-			WebElement rejectBtn = driver.findElement(By.xpath("//div[contains(text(),'Decline')]"));
-			rejectBtn.click();
-			System.out.println("Cookies Rejected");
-		} catch (NoSuchElementException e1) {
-			try {
-				// If decline not found, try "Allow Cookies"
-				WebElement acceptBtn = driver.findElement(By.xpath("//div[contains(text(),'Allow Cookies')]"));
-				acceptBtn.click();
-				System.out.println("Cookies Accepted");
-			} catch (NoSuchElementException e2) {
-				// If neither found, continue
-				System.out.println("No Cookies Found");
-			}
-		}
-	}
+    // Handle cookie banners if they appear on the site
+    public static void handleCookiesIfPresent(WebDriver driver) {
+        try {
+            // Try to find "Decline" button
+            WebElement rejectBtn = driver.findElement(By.xpath("//div[contains(text(),'Decline')]"));
+            rejectBtn.click();
+            System.out.println("Cookies Rejected");
+        } catch (NoSuchElementException e1) {
+            try {
+                // If decline not found, try "Allow Cookies"
+                WebElement acceptBtn = driver.findElement(By.xpath("//div[contains(text(),'Allow Cookies')]"));
+                acceptBtn.click();
+                System.out.println("Cookies Accepted");
+            } catch (NoSuchElementException e2) {
+                // If neither found, continue
+                System.out.println("No Cookies Found");
+            }
+        }
+    }
 
-	public void verifyChatBotVisible(String url, WebDriver driver) throws InterruptedException {
-		driver.get(url);
-		WebElement shadowHost = driver.findElement(By.cssSelector("my-component"));
-		WebElement chatButton = shadowHost.getShadowRoot()
-				.findElement(By.cssSelector("button.ChatButton-module_sdkChatButton__M1mKI"));
-		assertTrue(chatButton.isDisplayed(), "Chatbot is not visible for " + url);
+    public void verifyChatBotVisible(String url, WebDriver driver) throws InterruptedException {
+        driver.get(url);
+        WebElement shadowHost = driver.findElement(By.cssSelector("my-component"));
+        WebElement chatButton = shadowHost.getShadowRoot()
+                .findElement(By.cssSelector("button.ChatButton-module_sdkChatButton__M1mKI"));
+        assertTrue(chatButton.isDisplayed(), "Chatbot is not visible for " + url);
 
-	}
+    }
 
-	// Open chatbot button inside the shadow DOM
-	public static void clickChatBot(String url, WebDriver driver) {
-		try {
-			WebElement shadowHost = driver.findElement(By.cssSelector("my-component"));
-			SearchContext shadowRoot = shadowHost.getShadowRoot();
-			// Locate chatbot button inside shadow root
-			WebElement chatBtn = shadowRoot
-					.findElement(By.cssSelector("button.ChatButton-module_sdkChatButton__M1mKI"));
-			chatBtn.click();
-			Thread.sleep(3000);
-			System.out.println("Chatbot opened for: " + url);
-		} catch (Exception e) {
-			System.out.println("Couldn't open chatbot for: " + url + e.getMessage());
-		}
-	}
+    // Open chatbot button inside the shadow DOM
+    public static void clickChatBot(String url, WebDriver driver) {
+        try {
+            WebElement shadowHost = driver.findElement(By.cssSelector("my-component"));
+            SearchContext shadowRoot = shadowHost.getShadowRoot();
+            // Locate chatbot button inside shadow root
+            WebElement chatBtn = shadowRoot
+                    .findElement(By.cssSelector("button.ChatButton-module_sdkChatButton__M1mKI"));
+            chatBtn.click();
+            Thread.sleep(3000);
+            System.out.println("Chatbot opened for: " + url);
+        } catch (Exception e) {
+            System.out.println("Couldn't open chatbot for: " + url + e.getMessage());
+        }
+    }
 
-	// Count the default chatbot suggestions (buttons under input box)
-	public static int getDefaultSuggestionsCount(WebDriver driver) {
-		try {
-			WebElement shadowHost = driver.findElement(By.cssSelector("my-component"));
-			SearchContext shadowRoot = shadowHost.getShadowRoot();
+    // Count the default chatbot suggestions (buttons under input box)
+    public static int getDefaultSuggestionsCount(WebDriver driver) {
+        try {
+            WebElement shadowHost = driver.findElement(By.cssSelector("my-component"));
+            SearchContext shadowRoot = shadowHost.getShadowRoot();
 
-			// Look for suggestion buttons inside container
-			List<WebElement> items = shadowRoot
-					.findElements(By.cssSelector("div[class*='sdkSuggestedQuestionsContainer'] button"));
+            // Look for suggestion buttons inside container
+            List<WebElement> items = shadowRoot
+                    .findElements(By.cssSelector("div[class*='sdkSuggestedQuestionsContainer'] button"));
 
-			int count = items.size();
-			System.out.println("Found " + count + " for suggestive responses");
-			return count;
-		} catch (Exception e) {
-			System.out.println("Couldn't count suggestions: " + e.getMessage());
-			return 0;
-		}
-	}
+            int count = items.size();
+            System.out.println("Found " + count + " for suggestive responses");
+            return count;
+        } catch (Exception e) {
+            System.out.println("Couldn't count suggestions: " + e.getMessage());
+            return 0;
+        }
+    }
 
-	// Expand chatbot window to full screen mode
+    // Expand chatbot window to full screen mode
 
-	public static void expandChatBot(WebDriver driver) {
-		try {
-			WebElement shadowHost = driver.findElement(By.cssSelector("my-component"));
-			SearchContext shadowRoot = shadowHost.getShadowRoot();
+    public static void expandChatBot(WebDriver driver) {
+        try {
+            WebElement shadowHost = driver.findElement(By.cssSelector("my-component"));
+            SearchContext shadowRoot = shadowHost.getShadowRoot();
 
-			WebElement expandBtn = shadowRoot
-					.findElement(By.cssSelector("button.ChatHeader-module_sdkExpandButton__qtONk"));
-			expandBtn.click();
-			System.out.println("Chatbot Expanded");
-		} catch (Exception e) {
-			System.out.println("Couldn't expand chatbot: " + e.getMessage());
-		}
-	}
+            WebElement expandBtn = shadowRoot
+                    .findElement(By.cssSelector("button.ChatHeader-module_sdkExpandButton__qtONk"));
+            expandBtn.click();
+            System.out.println("Chatbot Expanded");
+        } catch (Exception e) {
+            System.out.println("Couldn't expand chatbot: " + e.getMessage());
+        }
+    }
 
-	// Close chatbot widget
-	public static void closeChatBot(WebDriver driver) {
-		try {
-			WebElement shadowHost = driver.findElement(By.cssSelector("my-component"));
-			SearchContext shadowRoot = shadowHost.getShadowRoot();
+    // Close chatbot widget
+    public static void closeChatBot(WebDriver driver) {
+        try {
+            WebElement shadowHost = driver.findElement(By.cssSelector("my-component"));
+            SearchContext shadowRoot = shadowHost.getShadowRoot();
 
-			WebElement closeBtn = shadowRoot
-					.findElement(By.cssSelector("button.ChatHeader-module_sdkCloseButton__AQvQv"));
-			closeBtn.click();
-			System.out.println("Chatbot closed");
-		} catch (Exception e) {
-			System.out.println("Couldn't close chatbot: " + e.getMessage());
-		}
-	}
+            WebElement closeBtn = shadowRoot
+                    .findElement(By.cssSelector("button.ChatHeader-module_sdkCloseButton__AQvQv"));
+            closeBtn.click();
+            System.out.println("Chatbot closed");
+        } catch (Exception e) {
+            System.out.println("Couldn't close chatbot: " + e.getMessage());
+        }
+    }
 
-	// Click on the schedule meeting (calendar) button inside chatbot
-	public static void scheduleMeeting(WebDriver driver) {
-		try {
-			WebElement shadowHost = driver.findElement(By.cssSelector("my-component"));
-			SearchContext shadowRoot = shadowHost.getShadowRoot();
+    // Click on the schedule meeting (calendar) button inside chatbot
+    public static void scheduleMeeting(WebDriver driver) {
+        try {
+            WebElement shadowHost = driver.findElement(By.cssSelector("my-component"));
+            SearchContext shadowRoot = shadowHost.getShadowRoot();
 
-			// Find schedule button inside input box
-			WebElement schdBtn = shadowRoot
-					.findElement(By.cssSelector("button.ChatInputBox-module_sdkCalendarButton__r3Rt3"));
-			schdBtn.click();
-			Thread.sleep(4000);
+            // Find schedule button inside input box
+            WebElement schdBtn = shadowRoot
+                    .findElement(By.cssSelector("button.ChatInputBox-module_sdkCalendarButton__r3Rt3"));
+            schdBtn.click();
+            Thread.sleep(4000);
 
-			System.out.println("Schedule Meeting Clicked");
-		} catch (Exception e) {
-			System.out.println("Couldn't find the schedule meeting button: " + e.getMessage());
-		}
-	}
+            System.out.println("Schedule Meeting Clicked");
+        } catch (Exception e) {
+            System.out.println("Couldn't find the schedule meeting button: " + e.getMessage());
+        }
+    }
 
-	// Get the last reply message text from chatbot
-	public static String getLastReply(WebDriver driver) throws InterruptedException {
+    // Get the last reply message text from chatbot
+    public static String getLastReply(WebDriver driver) throws InterruptedException {
 
-		// Locating the chatbot shadow host
-		WebElement host = driver.findElement(By.cssSelector("my-component"));
-		SearchContext root = host.getShadowRoot();
+        // Locating the chatbot shadow host
+        WebElement host = driver.findElement(By.cssSelector("my-component"));
+        SearchContext root = host.getShadowRoot();
 
-		// Wait until at least one botReply is present
-		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(12));
+        // Wait until at least one botReply is present
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(12));
 
-		List<WebElement> botReply = wait.until(d -> {
-			List<WebElement> list = root
-					.findElements(By.cssSelector("div[class='AiText-module_textContainer__UtZ-U']"));
-			return list.isEmpty() ? null : list;
-		});
+        List<WebElement> botReply = wait.until(d -> {
+            List<WebElement> list = root
+                    .findElements(By.cssSelector("div[class='AiText-module_textContainer__UtZ-U']"));
+            return list.isEmpty() ? null : list;
+        });
 
-		Thread.sleep(4000);
+        Thread.sleep(4000);
 
-		// Picking the very last reply botReply from the list
-		WebElement lastReply = botReply.get(botReply.size() - 1);
+        // Picking the very last reply botReply from the list
+        WebElement lastReply = botReply.get(botReply.size() - 1);
 
-		// Trying to read the direct text inside the botReply
-		String direct = lastReply.getText().trim();
-		if (!direct.isEmpty()) {
-			System.out.println("Bot Reply: " + direct);
-		}
-		return direct;
-	}
+        // Trying to read the direct text inside the botReply
+        String direct = lastReply.getText().trim();
+        if (!direct.isEmpty()) {
+            System.out.println("Bot Reply: " + direct);
+        }
+        return direct;
+    }
 
 
-	public static String greetingReply(WebDriver driver) throws InterruptedException {
-	    // opening the shadow root
-	    WebElement host = driver.findElement(By.cssSelector("my-component"));
-	    SearchContext root = host.getShadowRoot();
+    public static String greetingReply(WebDriver driver) throws InterruptedException {
+        // opening the shadow root
+        WebElement host = driver.findElement(By.cssSelector("my-component"));
+        SearchContext root = host.getShadowRoot();
 
-	    // getting the count of replies before sending greeting
-	    int initialCount = root.findElements(By.cssSelector("div[class*='AiText-module_textContainer']")).size();
+        //Hi
+        WebElement chatInput = root.findElement(By.cssSelector("textarea[role='textbox'][aria-label='Chat input']"));
+        chatInput.click();
+        chatInput.sendKeys("Hi");
 
-	   //Hi
-	    WebElement chatInput = root.findElement(By.cssSelector("textarea[role='textbox'][aria-label='Chat input']"));
-	    chatInput.click();
-	    chatInput.sendKeys("Hi");
+        // hitting the send button
+        WebElement sendBtn = root.findElement(By.cssSelector("button.ChatInputBox-module_sdkSendButton__CLWm6"));
+        sendBtn.click();
 
-	    // hitting the send button
-	    WebElement sendBtn = root.findElement(By.cssSelector("button.ChatInputBox-module_sdkSendButton__CLWm6"));
-	    sendBtn.click();
+        // waiting for bot to reply
+        Thread.sleep(4000);
 
-	    // waiting for bot to reply
-	    Thread.sleep(4000);
+        // getting all replies
+        List<WebElement> botReply = root.findElements(By.cssSelector("div[class*='AiText-module_textContainer']"));
 
-	    // getting all replies
-	    List<WebElement> botReply = root.findElements(By.cssSelector("div[class*='AiText-module_textContainer']"));
+        // picking the last reply
+        WebElement lastReply = botReply.get(botReply.size() - 1);
 
-	    // picking the last reply
-	    WebElement lastReply = botReply.get(botReply.size() - 1);
+        String direct = lastReply.getText().trim();
+        System.out.println("Bot Reply after greeting: " + direct);
 
-	    String direct = lastReply.getText().trim();
-	    System.out.println("Bot Reply after greeting: " + direct);
+        // wait until the 3 suggestion items show after greetings
+        new WebDriverWait(driver, Duration.ofSeconds(10)).until(d ->
+                root.findElements(By.cssSelector("h1[class*='suggestiveResponse']")).size() >= 3);
 
-	    return direct;
-	}
-	
-	
+        // collecting the suggestions and counting them
+        List<WebElement> greetSuggestions =
+                root.findElements(By.cssSelector("h1[class*='suggestiveResponse']"));
 
-	
-	
+        int greetCount = greetSuggestions.size();
+        System.out.println("Suggestions after greeting: " + greetCount);
+
+
+        return direct;
+    }
+
+    public static void clickRandomSuggestion(WebDriver driver) throws InterruptedException {
+        // open shadow root
+        WebElement host = driver.findElement(By.cssSelector("my-component"));
+        SearchContext root = host.getShadowRoot();
+
+        // Storing the responses in a variable
+        String sugTn = "h1[class*='suggestiveResponse']";
+
+        // clicking the responses
+        for (int i = 0; i < 3; i++) {
+
+            List<WebElement> suggestions = root.findElements(By.cssSelector(sugTn));
+            if (i >= suggestions.size()) {
+                break;
+            }
+
+            Thread.sleep(2000);
+            WebElement choice = suggestions.get(i);
+            String label = choice.getText().trim();
+            System.out.println("Clicking suggestion -> " + label);
+            choice.click();
+
+
+        }
+    }
+
+
+
+
 }
