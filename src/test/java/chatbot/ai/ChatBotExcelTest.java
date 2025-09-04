@@ -35,7 +35,7 @@ public class ChatBotExcelTest {
 		}
 	}
 
-	// Read Excel file and return data in Object[][] format
+	// Read Excel file and return data in Object[][] formation
 	public Object[][] getExcelData(String filePath) throws IOException {
 		List<String> urls = new ArrayList<>();
 
