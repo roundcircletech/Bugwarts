@@ -32,6 +32,7 @@ public class TestPreview {
                 .header(ACCEPT, APPLICATION_JSON)
                 .header(CLIENT_ID,payload.getString(CLIENT_ID))
                 .header(CONTENT_TYPE, APPLICATION_JSON)
+                .header(USER_AGENT, AGENT_MOZILLA)
                 .header(ORIGIN, payload.getString(ORIGIN))
                 .header(REFERER,payload.getString(REFERER)) .
                 when()
