@@ -10,7 +10,7 @@ import java.util.List;
 
 public class ChatBotActions {
 
-    //made common root for everyone
+    //made common Shadow Root for everyone
     private static SearchContext getRoot(WebDriver driver){
         WebElement host = driver.findElement(By.cssSelector("my-component"));
         return host.getShadowRoot();
@@ -34,19 +34,16 @@ public class ChatBotActions {
             }
         }
     }
-
     public void verifyChatBotVisible(String url, WebDriver driver) throws InterruptedException {
         driver.get(url);
        SearchContext root = getRoot(driver);
         WebElement chatButton = root.findElement(By.cssSelector("button.ChatButton-module_sdkChatButton__M1mKI"));
         assertTrue(chatButton.isDisplayed(), "Chatbot is not visible for " + url);
-
     }
     // Open chatbot button inside the shadow DOM
     public static void clickChatBot(String url, WebDriver driver) {
         try {
             SearchContext root = getRoot(driver);
-            // Locate chatbot button inside shadow root
             WebElement chatBtn = root.findElement(By.cssSelector("button.ChatButton-module_sdkChatButton__M1mKI"));
             chatBtn.click();
             Thread.sleep(3000);
@@ -59,7 +56,6 @@ public class ChatBotActions {
     public static int getDefaultSuggestionsCount(WebDriver driver) {
         try {
             SearchContext root = getRoot(driver);
-
             // Look for suggestion buttons inside container
             List<WebElement> items = root.findElements(By.cssSelector("div[class*='sdkSuggestedQuestionsContainer'] button"));
             int count = items.size();
@@ -70,9 +66,7 @@ public class ChatBotActions {
             return 0;
         }
     }
-
     // Expand chatbot window to full screen mode
-
     public static void expandChatBot(WebDriver driver) {
         try {
             SearchContext root = getRoot(driver);
@@ -94,15 +88,13 @@ public class ChatBotActions {
             System.out.println("Couldn't close chatbot: " + e.getMessage());
         }
     }
-
     // Click on the schedule meeting (calendar) button inside chatbot
     public static void scheduleMeeting(WebDriver driver) {
         try {
             SearchContext root = getRoot(driver);
-
             // Find schedule button inside input box
-            WebElement schdBtn = root.findElement(By.cssSelector("button.ChatInputBox-module_sdkCalendarButton__r3Rt3"));
-            schdBtn.click();
+            WebElement schBtn = root.findElement(By.cssSelector("button.ChatInputBox-module_sdkCalendarButton__r3Rt3"));
+            schBtn.click();
             Thread.sleep(4000);
             System.out.println("Schedule Meeting Clicked");
         } catch (Exception e) {
@@ -111,12 +103,9 @@ public class ChatBotActions {
     }
     // Get the last reply message text from chatbot
     public static String getLastReply(WebDriver driver) throws InterruptedException {
-
-        // Locating the chatbot shadow host
         SearchContext root = getRoot(driver);
         // Wait until at least one botReply is present
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(12));
-
         List<WebElement> botReply = wait.until(d -> {
             List<WebElement> list = root.findElements(By.cssSelector("div[class='AiText-module_textContainer__UtZ-U']"));
             return list.isEmpty() ? null : list;
@@ -131,12 +120,9 @@ public class ChatBotActions {
         }
         return direct;
     }
-
-
     public static String greetingReply(WebDriver driver) throws InterruptedException {
-        // opening the shadow root
         SearchContext root = getRoot(driver);
-        //Hi
+        //Sending Hi
         WebElement chatInput = root.findElement(By.cssSelector("textarea[role='textbox'][aria-label='Chat input']"));
         chatInput.click();
         chatInput.sendKeys("Hi");
@@ -161,9 +147,7 @@ public class ChatBotActions {
         System.out.println("Suggestions after greeting: " + greetCount);
         return direct;
     }
-
     public static void clickRandomSuggestion(WebDriver driver) throws InterruptedException {
-        // open shadow root
         SearchContext root = getRoot(driver);
         // Storing the responses in a variable
         String sugTn = "h1[class*='suggestiveResponse']";
@@ -178,7 +162,6 @@ public class ChatBotActions {
             String label = choice.getText().trim();
             System.out.println("Clicking suggestion -> " + label);
             choice.click();
-
         }
     }
 }
