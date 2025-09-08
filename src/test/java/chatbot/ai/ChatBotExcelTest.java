@@ -1,14 +1,14 @@
 package chatbot.ai;
 
 import com.opencsv.CSVReader;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeMethod;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.testng.Assert;
 import org.testng.annotations.*;
-
+import org.openqa.selenium.chrome.ChromeOptions;
 import java.io.FileReader;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -20,7 +20,27 @@ public class ChatBotExcelTest {
 
     @BeforeMethod
     public void setUp() {
-        driver = new ChromeDriver();
+        FirefoxOptions options = new FirefoxOptions();
+        options.addArguments("-headless");
+        // Set window size (works better with headless)
+        options.addArguments("--width=1920");
+        options.addArguments("--height=1080");
+
+        // Set a custom user agent
+        options.addPreference("general.useragent.override", 
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+            "(KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36");
+
+        // Security/feature preferences (Firefox equivalents)
+        options.addPreference("security.sandbox.content.level", 5); // Moderate sandboxing
+        options.addPreference("dom.security.https_only_mode", false);
+        options.addPreference("dom.disable_open_during_load", false);
+        options.addPreference("media.autoplay.default", 0);
+
+        // Launch Firefox
+        WebDriver driver = new FirefoxDriver(options);
+        
+        // For local ChromeDriver
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
         driver.manage().window().maximize();
     }
