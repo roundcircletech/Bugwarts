@@ -1,14 +1,12 @@
 package chatbot.ai;
 
 import com.opencsv.CSVReader;
-
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.testng.Assert;
 import org.testng.annotations.*;
-import org.openqa.selenium.chrome.ChromeOptions;
+
 import java.io.FileReader;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -20,29 +18,31 @@ public class ChatBotExcelTest {
 
     @BeforeMethod
     public void setUp() {
+        // If geckodriver is not in PATH, set it explicitly:
+        // System.setProperty("webdriver.gecko.driver", "path/to/geckodriver");
+
         FirefoxOptions options = new FirefoxOptions();
-        options.addArguments("-headless");
-        // Set window size (works better with headless)
+
+        // Window size
         options.addArguments("--width=1920");
         options.addArguments("--height=1080");
 
         // Set a custom user agent
-        options.addPreference("general.useragent.override", 
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
-            "(KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36");
+        options.addPreference("general.useragent.override",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+                "(KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36");
 
-        // Security/feature preferences (Firefox equivalents)
-        options.addPreference("security.sandbox.content.level", 5); // Moderate sandboxing
+        // Useful Firefox preferences
         options.addPreference("dom.security.https_only_mode", false);
         options.addPreference("dom.disable_open_during_load", false);
         options.addPreference("media.autoplay.default", 0);
 
         // Launch Firefox
-        WebDriver driver = new FirefoxDriver(options);
-        
-        // For local ChromeDriver
+        driver = new FirefoxDriver(options);
+
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
-        driver.manage().window().maximize();
+        // If you don’t want fixed size, you can maximize instead:
+        // driver.manage().window().maximize();
     }
 
     @AfterMethod
@@ -51,22 +51,25 @@ public class ChatBotExcelTest {
             driver.quit();
         }
     }
+
     private Object[][] getCsvUrls() throws Exception {
         List<String> urls = new ArrayList<>();
         try (CSVReader reader = new CSVReader(new FileReader("src/test/resources/clientDetails.csv"))) {
             String[] row;
-            reader.readNext(); // skipping the header
+            reader.readNext(); // skip header
             while ((row = reader.readNext()) != null) {
                 if (row.length > 1 && row[1] != null && !row[1].trim().isEmpty()) {
-                    urls.add(row[1].trim()); // using column "URL"
+                    urls.add(row[1].trim());
                 }
             }
         }
         Object[][] data = new Object[urls.size()][1];
-        for (int i = 0; i < urls.size(); i++) data[i][0] = urls.get(i);
+        for (int i = 0; i < urls.size(); i++) {
+            data[i][0] = urls.get(i);
+        }
         return data;
     }
-    //URLs from Excel to tests
+
     @DataProvider(name = "chatbotUrls")
     public Object[][] provideUrls() throws Exception {
         return getCsvUrls();
@@ -86,5 +89,4 @@ public class ChatBotExcelTest {
         ChatBotActions.clickRandomSuggestion(driver);
         ChatBotActions.closeChatBot(driver);
     }
-
 }
