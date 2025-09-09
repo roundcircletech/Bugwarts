@@ -4,14 +4,13 @@
     <!-- API tests -->
     <test name="API - Preview">
         <classes>
-            <class name="discovery.TestPreview"/>
+            <class name="api.TestPreview"/>
         </classes>
     </test>
-
     <!-- UI tests -->
     <test name="UI - Chatbot">
         <classes>
-            <class name="chatbot.ai.ChatBotExcelTest"/>
+            <class name="ui.chatbot.ChatBotTest"/>
         </classes>
     </test>
-</suite> 
+</suite>
