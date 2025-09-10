@@ -14,11 +14,11 @@ public class DriverManager {
     public static WebDriver getDriver() {
         if (driver == null) {
             FirefoxOptions options = new FirefoxOptions();
-            options.addArguments("--headless");
+//            options.addArguments("--headless");
             driver = new FirefoxDriver(options);
             driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
             driver.manage().window().maximize();
-            System.out.println("Firefox Driver started");
+//            System.out.println("Firefox Driver started");
         }
         return driver;
     }
@@ -27,7 +27,6 @@ public class DriverManager {
         if (driver != null) {
             driver.quit();
             driver = null;
-            System.out.println("Driver closed");
         }
     }
 }
