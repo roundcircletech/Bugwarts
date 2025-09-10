@@ -14,7 +14,7 @@ public class DriverManager {
     public static WebDriver getDriver() {
         if (driver == null) {
             FirefoxOptions options = new FirefoxOptions();
-//            options.addArguments("--headless");
+            options.addArguments("--headless");
             driver = new FirefoxDriver(options);
             driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
             driver.manage().window().maximize();
