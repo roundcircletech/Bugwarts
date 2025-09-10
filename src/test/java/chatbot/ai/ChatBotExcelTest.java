@@ -26,7 +26,7 @@ public class ChatBotExcelTest {
         // Window size
         options.addArguments("--width=1920");
         options.addArguments("--height=1080");
-
+        options.addArguments("--headless");
         // Set a custom user agent
         options.addPreference("general.useragent.override",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
