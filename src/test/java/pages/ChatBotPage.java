@@ -163,7 +163,7 @@ public class ChatBotPage {
             new WebDriverWait(driver, Duration.ofSeconds(10))
                     .until(d -> core.Shadow.findAll(core.Shadow.getRoot(driver), reply).size() > beforeCount);
 
-            Thread.sleep(1500);
+            Thread.sleep(3000);
         }
     }
 }
