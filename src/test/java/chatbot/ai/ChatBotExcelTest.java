@@ -2,8 +2,8 @@ package chatbot.ai;
 
 import com.opencsv.CSVReader;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.Assert;
 import org.testng.annotations.*;
 
@@ -18,31 +18,30 @@ public class ChatBotExcelTest {
 
     @BeforeMethod
     public void setUp() {
-        // If geckodriver is not in PATH, set it explicitly:
-        // System.setProperty("webdriver.gecko.driver", "path/to/geckodriver");
+        // If chromedriver is not in PATH, set it explicitly:
+        // System.setProperty("webdriver.chrome.driver", "/usr/local/bin/chromedriver");
 
-        FirefoxOptions options = new FirefoxOptions();
+        ChromeOptions options = new ChromeOptions();
 
         // Window size
-        options.addArguments("--width=1920");
-        options.addArguments("--height=1080");
-        options.addArguments("--headless");
+        options.addArguments("--window-size=1920,1080");
+        options.addArguments("--headless=new");  // modern headless mode
+
         // Set a custom user agent
-        options.addPreference("general.useragent.override",
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
-                "(KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36");
+        options.addArguments(
+            "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
+            "AppleWebKit/537.36 (KHTML, like Gecko) " +
+            "Chrome/116.0.0.0 Safari/537.36"
+        );
 
-        // Useful Firefox preferences
-        options.addPreference("dom.security.https_only_mode", false);
-        options.addPreference("dom.disable_open_during_load", false);
-        options.addPreference("media.autoplay.default", 0);
+        // Useful Chrome flags for containers/CI
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--no-sandbox");
 
-        // Launch Firefox
-        driver = new FirefoxDriver(options);
+        // Launch Chrome/Chromium
+        driver = new ChromeDriver(options);
 
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
-        // If you don’t want fixed size, you can maximize instead:
-        // driver.manage().window().maximize();
     }
 
     @AfterMethod
