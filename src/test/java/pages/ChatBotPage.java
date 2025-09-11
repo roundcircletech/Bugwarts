@@ -18,6 +18,10 @@ public class ChatBotPage {
         this.root = Shadow.getRoot(driver);
     }
 
+    public int greetingReply() throws InterruptedException {
+        return doGreetingReply(this.driver);
+    }
+
     private static boolean isSchedulerReply(String text) {
         if (text == null) return false;
         String s = text.toLowerCase();
@@ -39,9 +43,10 @@ public class ChatBotPage {
             List<WebElement> msgs = r.findElements(By.cssSelector("div[class*='AiText-module_textContainer']"));
             return msgs.size() > previousCount ? msgs.get(msgs.size() - 1) : null;
         });
+
         String text = "", curr;
         long stableFor = 0;
-        while (stableFor < 600) { // wait until stable ~0.6s
+        while (stableFor < 600) { // ~0.6s stable text
             curr = bubble.getText().trim();
             if (!curr.equals(text)) {
                 text = curr;
@@ -53,7 +58,6 @@ public class ChatBotPage {
         }
         return text;
     }
-
 
     public void handleCookies() {
         try {
@@ -132,13 +136,11 @@ public class ChatBotPage {
         Thread.sleep(3000);
         WebElement last = botReply.get(botReply.size() - 1);
         String text = last.getText().trim();
-        if (!text.isEmpty()) {
-            System.out.println("Bot: " + text);
-        }
+        if (!text.isEmpty()) System.out.println("Bot: " + text);
         return text;
     }
 
-    public static int greetingReply(WebDriver driver) throws InterruptedException {
+    private static int doGreetingReply(WebDriver driver) throws InterruptedException {
         waitForMainChatInput(driver, Duration.ofSeconds(10));
 
         String reply;
