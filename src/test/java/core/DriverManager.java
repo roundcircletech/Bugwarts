@@ -15,6 +15,7 @@ public class DriverManager {
         if (driver == null) {
             FirefoxOptions options = new FirefoxOptions();
             options.addArguments("--headless");
+            options.addArguments("--width=1920","--height=1080");
             driver = new FirefoxDriver(options);
             driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
             driver.manage().window().maximize();
