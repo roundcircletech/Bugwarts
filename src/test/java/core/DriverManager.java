@@ -22,9 +22,10 @@ public class DriverManager {
                     ChromeOptions chromeOptions = new ChromeOptions();
                     chromeOptions.addArguments("--headless=new"); 
                     chromeOptions.addArguments("--window-size=1920,1080");
+                    chromeOptions.addArguments("--no-sandbox");
+                    chromeOptions.addArguments("--disable-dev-shm-usage");
                     driver = new ChromeDriver(chromeOptions);
                     break;
-
                 case "firefox":
                 default:
                     FirefoxOptions options = new FirefoxOptions();
