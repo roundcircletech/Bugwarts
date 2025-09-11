@@ -88,6 +88,7 @@ public class ChatBotPage {
             root = Shadow.getRoot(driver);
             Shadow.find(root, "button.ChatHeader-module_sdkExpandButton__qtONk").click();
             System.out.println("Expanded");
+            Thread.sleep(400);
         } catch (Exception e) {
             System.out.println("Expand failed: " + e.getMessage());
         }
@@ -205,8 +206,31 @@ public class ChatBotPage {
 
             int before = Shadow.findAll(root, reply).size();
 
+            ((JavascriptExecutor) driver).executeScript(
+                    "arguments[0].scrollIntoView({block:'center', inline:'nearest'});",
+                    choice
+            );
+
+
+            WebElement finalChoice = choice;
+            new WebDriverWait(driver, Duration.ofSeconds(3)).until(d ->
+                    (Boolean) ((JavascriptExecutor) d).executeScript(
+                            "const el = arguments[0];" +
+                                    "if (!el) return false;" +
+                                    "const r = el.getBoundingClientRect();" +
+                                    "const x = Math.floor(r.left + r.width/2);" +
+                                    "const y = Math.floor(r.top + r.height/2);" +
+                                    "const root = el.getRootNode();" +
+                                    "const topEl = (root && root.elementFromPoint) ? root.elementFromPoint(x, y) : document.elementFromPoint(x, y);" +
+                                    "return topEl === el || el.contains(topEl);",
+                            finalChoice
+                    )
+            );
+
             try {
                 choice.click();
+            } catch (ElementClickInterceptedException e) {
+                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", choice);
             } catch (StaleElementReferenceException e) {
                 root = Shadow.getRoot(driver);
                 suggestions = Shadow.findAll(root, sug);
@@ -214,7 +238,6 @@ public class ChatBotPage {
                     suggestions.get(i).click();
                 }
             }
-
             new WebDriverWait(driver, Duration.ofSeconds(10))
                     .until(d -> Shadow.findAll(Shadow.getRoot(d), reply).size() > before);
 
