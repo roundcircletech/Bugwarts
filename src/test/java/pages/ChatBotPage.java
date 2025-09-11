@@ -25,192 +25,196 @@ public class ChatBotPage {
     }
 
     private static void waitForMainChatInput(WebDriver driver, Duration timeout) {
-        new WebDriverWait(driver, Duration.ofSeconds(timeout.getSeconds())).until(d -> {
+        new WebDriverWait(driver, timeout).until(d -> {
             SearchContext r = d.findElement(By.cssSelector("my-component")).getShadowRoot();
             return !r.findElements(By.cssSelector("textarea[role='textbox'][aria-label='Chat input']")).isEmpty();
         });
     }
 
     private static String waitAndGetNewAgentReply(WebDriver driver, int previousCount, Duration timeout) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeout.getSeconds()));
-        return wait.until(d -> {
+        WebDriverWait wait = new WebDriverWait(driver, timeout);
+
+        WebElement bubble = wait.until(d -> {
             SearchContext r = d.findElement(By.cssSelector("my-component")).getShadowRoot();
             List<WebElement> msgs = r.findElements(By.cssSelector("div[class*='AiText-module_textContainer']"));
-            if (msgs.size() > previousCount) {
-                return msgs.get(msgs.size() - 1).getText();
-            }
-            return null;
+            return msgs.size() > previousCount ? msgs.get(msgs.size() - 1) : null;
         });
+        String text = "", curr;
+        long stableFor = 0;
+        while (stableFor < 600) { // wait until stable ~0.6s
+            curr = bubble.getText().trim();
+            if (!curr.equals(text)) {
+                text = curr;
+                stableFor = 0;
+            } else {
+                stableFor += 150;
+            }
+            try { Thread.sleep(150); } catch (InterruptedException ignored) {}
+        }
+        return text;
     }
+
+
     public void handleCookies() {
         try {
             driver.findElement(By.xpath("//div[contains(text(),'Decline')]")).click();
-            System.out.println("Cookies Rejected");
+            System.out.println("Cookies: declined");
         } catch (NoSuchElementException e1) {
             try {
                 driver.findElement(By.xpath("//div[contains(text(),'Allow Cookies')]")).click();
-                System.out.println("Cookies Accepted");
+                System.out.println("Cookies: accepted");
             } catch (NoSuchElementException e2) {
-                System.out.println("No Cookies Found");
+                System.out.println("Cookies: none");
             }
         }
     }
+
     public void clickChatBot(String url) {
         try {
+            root = Shadow.getRoot(driver);
             Shadow.find(root, "button.ChatButton-module_sdkChatButton__M1mKI").click();
-            System.out.println("Chatbot opened for: " + url);
+            System.out.println("Chat opened: " + url);
         } catch (Exception e) {
-            System.out.println("Couldn't open chatbot for: " + url + " | " + e.getMessage());
+            System.out.println("Open failed: " + url + " | " + e.getMessage());
         }
     }
 
     public void expand() {
         try {
+            root = Shadow.getRoot(driver);
             Shadow.find(root, "button.ChatHeader-module_sdkExpandButton__qtONk").click();
-            System.out.println("Chatbot Expanded");
+            System.out.println("Expanded");
         } catch (Exception e) {
-            System.out.println("Couldn't expand chatbot: " + e.getMessage());
+            System.out.println("Expand failed: " + e.getMessage());
         }
     }
 
     public void close() {
         try {
+            root = Shadow.getRoot(driver);
             Shadow.find(root, "button.ChatHeader-module_sdkCloseButton__AQvQv").click();
-            System.out.println("Chatbot closed");
+            System.out.println("Closed");
         } catch (Exception e) {
-            System.out.println("Couldn't close chatbot: " + e.getMessage());
+            System.out.println("Close failed: " + e.getMessage());
         }
     }
 
     public int getDefaultSuggestionsCount() {
         try {
+            root = Shadow.getRoot(driver);
             List<WebElement> items = Shadow.findAll(root, "div[class*='sdkSuggestedQuestionsContainer'] button");
-            System.out.println("Found " + items.size() + " for suggestive responses");
+            System.out.println("Suggestions: " + items.size());
             return items.size();
         } catch (Exception e) {
-            System.out.println("Couldn't count suggestions: " + e.getMessage());
+            System.out.println("Suggestions count failed: " + e.getMessage());
             return 0;
         }
     }
 
     public void scheduleMeeting() {
         try {
+            root = Shadow.getRoot(driver);
             Shadow.find(root, "button.ChatInputBox-module_sdkCalendarButton__r3Rt3").click();
             Thread.sleep(2000);
-            System.out.println("Schedule Meeting Clicked");
+            System.out.println("Scheduler clicked");
         } catch (Exception e) {
-            System.out.println("Couldn't find the schedule meeting button: " + e.getMessage());
+            System.out.println("Scheduler click failed: " + e.getMessage());
         }
     }
 
     public String getLastReply() throws InterruptedException {
         List<WebElement> botReply = Waits.until(driver, d -> {
-            List<WebElement> list = Shadow.findAll(root, "div[class*='AiText-module_textContainer']");
+            SearchContext r = Shadow.getRoot(d);
+            List<WebElement> list = Shadow.findAll(r, "div[class*='AiText-module_textContainer']");
             return list.isEmpty() ? null : list;
         }, 12);
 
         Thread.sleep(3000);
-        WebElement lastReply = botReply.get(botReply.size() - 1);
-        String text = lastReply.getText().trim();
+        WebElement last = botReply.get(botReply.size() - 1);
+        String text = last.getText().trim();
         if (!text.isEmpty()) {
-            System.out.println("Bot Reply: " + text);
+            System.out.println("Bot: " + text);
         }
         return text;
     }
 
     public static int greetingReply(WebDriver driver) throws InterruptedException {
-        SearchContext root = driver.findElement(By.cssSelector("my-component")).getShadowRoot();
-
-        if (root.findElements(By.cssSelector("textarea[role='textbox'][aria-label='Chat input']")).isEmpty()) {
-            System.out.println("Scheduler is open");
-        }
         waitForMainChatInput(driver, Duration.ofSeconds(10));
-        root = driver.findElement(By.cssSelector("my-component")).getShadowRoot();
 
-        int before = root.findElements(By.cssSelector("div[class*='AiText-module_textContainer']")).size();
-        WebElement chatInput = root.findElement(By.cssSelector("textarea[role='textbox'][aria-label='Chat input']"));
-        chatInput.click();
-        chatInput.sendKeys("Hi");
-        root.findElement(By.cssSelector("button.ChatInputBox-module_sdkSendButton__CLWm6")).click();
-        Thread.sleep(3000);
-        String reply = waitAndGetNewAgentReply(driver, before, Duration.ofSeconds(12));
-        System.out.println("Reply after greetings: " + reply);
+        String reply;
+        for (int attempt = 0; attempt < 2; attempt++) {
+            SearchContext root = driver.findElement(By.cssSelector("my-component")).getShadowRoot();
 
-        if (isSchedulerReply(reply)) {
-            System.out.println("Scheduler is open");
-            waitForMainChatInput(driver, Duration.ofSeconds(10));
+            int before = root.findElements(By.cssSelector("div[class*='AiText-module_textContainer']")).size();
 
-            SearchContext r2 = driver.findElement(By.cssSelector("my-component")).getShadowRoot();
-            int beforeRetry = r2.findElements(By.cssSelector("div[class*='AiText-module_textContainer']")).size();
+            WebElement chatInput = root.findElement(By.cssSelector("textarea[role='textbox'][aria-label='Chat input']"));
+            chatInput.click();
+            chatInput.sendKeys("Hi");
 
-            WebElement chatInput2 = r2.findElement(By.cssSelector("textarea[role='textbox'][aria-label='Chat input']"));
-            chatInput2.click();
-            chatInput2.sendKeys("Hi");
-            r2.findElement(By.cssSelector("button.ChatInputBox-module_sdkSendButton__CLWm6")).click();
+            root.findElement(By.cssSelector("button.ChatInputBox-module_sdkSendButton__CLWm6")).click();
+
             Thread.sleep(3000);
-            reply = waitAndGetNewAgentReply(driver, beforeRetry, Duration.ofSeconds(12));
-            System.out.println("Reply after greetings: " + reply);
+            reply = waitAndGetNewAgentReply(driver, before, Duration.ofSeconds(12));
+            System.out.println("Reply: " + reply);
+
+            if (isSchedulerReply(reply) && attempt == 0) {
+                System.out.println("Scheduler -> retry");
+                waitForMainChatInput(driver, Duration.ofSeconds(10));
+                continue;
+            }
+            break;
         }
 
-        root = driver.findElement(By.cssSelector("my-component")).getShadowRoot();
+        SearchContext root = driver.findElement(By.cssSelector("my-component")).getShadowRoot();
         int suggestions = root.findElements(By.cssSelector("h1[class*='suggestiveResponse']")).size();
         if (suggestions == 0) {
             Thread.sleep(600);
             root = driver.findElement(By.cssSelector("my-component")).getShadowRoot();
             suggestions = root.findElements(By.cssSelector("h1[class*='suggestiveResponse']")).size();
         }
-        System.out.println("Suggestions after greeting: " + suggestions);
 
+        System.out.println("Suggestions: " + suggestions);
         return suggestions;
     }
 
-
     public void clickRandomSuggestions() throws InterruptedException {
-        // Shadow root
-        SearchContext root = core.Shadow.getRoot(driver);
-
         String sug = "h1[class*='suggestiveResponse']";
         String reply = "div[class*='AiText-module_textContainer']";
 
         for (int i = 0; i < 3; i++) {
-            List<WebElement> suggestions = core.Shadow.findAll(root, sug);
-            if (i >= suggestions.size()) {
-                break;
-            }
+            root = Shadow.getRoot(driver);
+            List<WebElement> suggestions = Shadow.findAll(root, sug);
+            if (i >= suggestions.size()) break;
 
             WebElement choice = suggestions.get(i);
             String label = "";
-
             try {
                 label = choice.getText().trim();
             } catch (StaleElementReferenceException e) {
-                // if element goes stale, refreshing the "root and suggestions"
-                root = core.Shadow.getRoot(driver);
-                suggestions = core.Shadow.findAll(root, sug);
+                root = Shadow.getRoot(driver);
+                suggestions = Shadow.findAll(root, sug);
                 if (i < suggestions.size()) {
                     choice = suggestions.get(i);
                     label = choice.getText().trim();
                 }
             }
 
-            System.out.println("Clicking suggestion -> " + label);
+            System.out.println("Click -> " + label);
 
-            int beforeCount = core.Shadow.findAll(root, reply).size();
+            int before = Shadow.findAll(root, reply).size();
 
             try {
                 choice.click();
             } catch (StaleElementReferenceException e) {
-                // retrying once more if it gets failed first time
-                root = core.Shadow.getRoot(driver);
-                suggestions = core.Shadow.findAll(root, sug);
+                root = Shadow.getRoot(driver);
+                suggestions = Shadow.findAll(root, sug);
                 if (i < suggestions.size()) {
-                    choice = suggestions.get(i);
-                    choice.click();
+                    suggestions.get(i).click();
                 }
             }
-            // waiting for a new reply after click happens
+
             new WebDriverWait(driver, Duration.ofSeconds(10))
-                    .until(d -> core.Shadow.findAll(core.Shadow.getRoot(driver), reply).size() > beforeCount);
+                    .until(d -> Shadow.findAll(Shadow.getRoot(d), reply).size() > before);
 
             Thread.sleep(3000);
         }
