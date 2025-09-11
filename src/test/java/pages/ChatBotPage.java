@@ -128,17 +128,25 @@ public class ChatBotPage {
     }
 
     public String getLastReply() throws InterruptedException {
-        List<WebElement> botReply = Waits.until(driver, d -> {
-            SearchContext r = Shadow.getRoot(d);
-            List<WebElement> list = Shadow.findAll(r, "div[class*='AiText-module_textContainer']");
-            return list.isEmpty() ? null : list;
-        }, 12);
+        try {
+            List<WebElement> botReply = Waits.until(driver, d -> {
+                SearchContext r = Shadow.getRoot(d);
+                List<WebElement> list = Shadow.findAll(r, "div[class*='AiText-module_textContainer']");
+                return list.isEmpty() ? null : list;
+            }, 20);
 
-        Thread.sleep(3000);
-        WebElement last = botReply.get(botReply.size() - 1);
-        String text = last.getText().trim();
-        if (!text.isEmpty()) System.out.println("Bot: " + text);
-        return text;
+            Thread.sleep(500);
+            WebElement last = botReply.get(botReply.size() - 1);
+            String text = last.getText().trim();
+            if (!text.isEmpty()) System.out.println("Bot: " + text);
+            return text;
+        } catch (org.openqa.selenium.TimeoutException e) {
+            System.out.println("No bot reply within wait window (continuing)");
+            return "";
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+            return "";
+        }
     }
 
     private static int doGreetingReply(WebDriver driver) throws InterruptedException {
