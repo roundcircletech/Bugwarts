@@ -249,7 +249,7 @@ public class ChatBotPage {
             new WebDriverWait(driver, Duration.ofSeconds(10))
                     .until(d -> Shadow.findAll(Shadow.getRoot(d), reply).size() > before);
 
-            Thread.sleep(3000);
+            Thread.sleep(5000);
         }
     }
 }
