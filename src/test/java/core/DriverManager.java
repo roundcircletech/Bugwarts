@@ -20,7 +20,7 @@ public class DriverManager {
             switch (browser){
                 case "chrome":
                     ChromeOptions chromeOptions = new ChromeOptions();
-                    chromeOptions.addArguments("--headless=new"); // new headless mode
+                    chromeOptions.addArguments("--headless=new"); 
                     chromeOptions.addArguments("--window-size=1920,1080");
                     driver = new ChromeDriver(chromeOptions);
                     break;
