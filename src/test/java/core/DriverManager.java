@@ -18,11 +18,13 @@ public class DriverManager {
             switch (browser){
                 case "chrome":
                     ChromeOptions chromeOptions = new ChromeOptions();
-                    chromeOptions.addArguments("--headless=new");
+                    chromeOptions.addArguments("--headless");
                     chromeOptions.addArguments("--window-size=1920,1080");
                     chromeOptions.addArguments("--no-sandbox");
                     chromeOptions.addArguments("--disable-dev-shm-usage");
-                    chromeOptions.addArguments( "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36");
+                    chromeOptions.addArguments("--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                        + "AppleWebKit/537.36 (KHTML, like Gecko) "
+                        + "Chrome/139.0.0.0 Safari/537.36");
                     driver = new ChromeDriver(chromeOptions);
                     break;
 
