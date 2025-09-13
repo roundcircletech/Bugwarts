@@ -1,17 +1,18 @@
 package core;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.List;
 
 public class Shadow {
 
     public static SearchContext getRoot(WebDriver driver) {
-        WebElement host = driver.findElement(By.cssSelector("my-component"));
-        return host.getShadowRoot();
+        return new WebDriverWait(driver, Duration.ofSeconds(10))
+                .ignoring(NoSuchElementException.class)
+                .ignoring(StaleElementReferenceException.class)
+                .until(d -> d.findElement(By.cssSelector("my-component")).getShadowRoot());
     }
 
     public static WebElement find(SearchContext root, String css) {
