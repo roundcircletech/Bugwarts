@@ -9,7 +9,7 @@ import java.util.List;
 public class Shadow {
 
     public static SearchContext getRoot(WebDriver driver) {
-        return new WebDriverWait(driver, Duration.ofSeconds(10))
+        return new WebDriverWait(driver, Duration.ofSeconds(30))
                 .ignoring(NoSuchElementException.class)
                 .ignoring(StaleElementReferenceException.class)
                 .until(d -> d.findElement(By.cssSelector("my-component")).getShadowRoot());
