@@ -145,7 +145,7 @@ public class ChatBotPage {
                 return list.isEmpty() ? null : list;
             }, 20);
 
-            Thread.sleep(500);
+            Thread.sleep(9000);
             WebElement last = botReply.get(botReply.size() - 1);
             String text = last.getText().trim();
             if (!text.isEmpty()) System.out.println("Bot: " + text);
@@ -171,7 +171,7 @@ public class ChatBotPage {
 
             root.findElement(BY_SEND).click();
 
-            Thread.sleep(3000); 
+            Thread.sleep(3000);
             reply = waitAndGetNewAgentReply(driver, before, Duration.ofSeconds(12));
             System.out.println("Reply: " + reply);
 
@@ -195,25 +195,84 @@ public class ChatBotPage {
         return suggestions;
     }
 
-    private SearchContext R() { return Shadow.getRoot(driver); }
+    private List<WebElement> waitForVisibleSuggestions(Duration timeout) {
+        long end = System.currentTimeMillis() + timeout.toMillis();
+        while (System.currentTimeMillis() < end) {
+            try {
+                SearchContext r = Shadow.getRoot(driver);
+                List<WebElement> list = r.findElements(BY_SUGGEST);
+                list.removeIf(e -> {
+                    try { return !e.isDisplayed() || e.getText().trim().isEmpty(); }
+                    catch (Exception ex) { return true; }
+                });
+                if (!list.isEmpty()) return list;
+            } catch (StaleElementReferenceException | NoSuchElementException ignored) {}
+            try { Thread.sleep(120); } catch (InterruptedException ignored) {}
+        }
+        return new java.util.ArrayList<>();
+    }
 
-    private static boolean isVisible(WebElement el) {
+    private String suggestionSignature() {
         try {
-            return el != null && el.isDisplayed();
+            SearchContext r = Shadow.getRoot(driver);
+            List<WebElement> list = r.findElements(BY_SUGGEST);
+            StringBuilder sb = new StringBuilder();
+            for (WebElement e : list) {
+                try {
+                    if (e.isDisplayed()) sb.append(e.getText().trim()).append("|");
+                } catch (Exception ignored) {}
+            }
+            return sb.toString();
         } catch (Exception e) {
-            return false;
+            return "";
         }
     }
 
-    private List<WebElement> waitForVisibleSuggestions(Duration timeout) {
-        WebDriverWait w = new WebDriverWait(driver, timeout);
-        return w.ignoring(NoSuchElementException.class)
-                .ignoring(StaleElementReferenceException.class)
-                .until(d -> {
-                    List<WebElement> list = Shadow.findAll(Shadow.getRoot(d), "h1[class*='suggestiveResponse']");
-                    list.removeIf(el -> !isVisible(el));
-                    return list.isEmpty() ? null : list;
-                });
+    private List<WebElement> waitForSuggestionsChange(String oldSig, long maxWaitMs) {
+        long end = System.currentTimeMillis() + maxWaitMs;
+        while (System.currentTimeMillis() < end) {
+            String sig = suggestionSignature();
+            if (!sig.isEmpty() && !sig.equals(oldSig)) {
+                return waitForVisibleSuggestions(Duration.ofSeconds(5));
+            }
+            try { Thread.sleep(150); } catch (InterruptedException ignored) {}
+        }
+        return new java.util.ArrayList<>();
+    }
+
+    private int getCurrentBotReplyCount() {
+        SearchContext r = Shadow.getRoot(driver);
+        return r.findElements(BY_AGENT_TEXT).size();
+    }
+
+    private String waitForNewBotReplyStable(int oldCount, long quietMs, long maxWaitMs) {
+        long start = System.currentTimeMillis();
+        long lastChange = start;
+        String last = "";
+        WebElement latest = null;
+
+        while (System.currentTimeMillis() - start < maxWaitMs) {
+            try {
+                SearchContext r = driver.findElement(BY_HOST).getShadowRoot();
+                List<WebElement> bubbles = r.findElements(BY_AGENT_TEXT);
+
+                if (bubbles.size() > oldCount) {
+                    latest = bubbles.get(bubbles.size() - 1);
+                    String cur = (String) ((JavascriptExecutor) driver)
+                            .executeScript("return arguments[0].innerText || arguments[0].textContent || '';", latest);
+                    cur = (cur == null) ? "" : cur.trim();
+
+                    if (!cur.equals(last)) {
+                        last = cur;
+                        lastChange = System.currentTimeMillis();
+                    } else if (System.currentTimeMillis() - lastChange >= quietMs) {
+                        return last;
+                    }
+                }
+            } catch (StaleElementReferenceException | NoSuchElementException ignored) {}
+            try { Thread.sleep(120); } catch (InterruptedException ignored) {}
+        }
+        return last;
     }
 
     private void easyClick(WebElement el) {
@@ -230,30 +289,41 @@ public class ChatBotPage {
     }
 
     public void clickRandomSuggestions() throws InterruptedException {
-        final String reply = "div[class*='AiText-module_textContainer']";
-
         List<WebElement> sugs = waitForVisibleSuggestions(Duration.ofSeconds(45));
+        if (sugs.isEmpty()) {
+            System.out.println("No suggestions visible initially, skipping.");
+            return;
+        }
         System.out.println("Found " + sugs.size() + " suggestive responses");
 
         int clicks = Math.min(3, sugs.size());
         for (int i = 0; i < clicks; i++) {
-            sugs = waitForVisibleSuggestions(Duration.ofSeconds(15));
-            if (i >= sugs.size()) break;
+            sugs = waitForVisibleSuggestions(Duration.ofSeconds(30));
+            if (sugs.isEmpty() || i >= sugs.size()) {
+                System.out.println("No suggestions to click now, stopping.");
+                break;
+            }
 
             WebElement choice = sugs.get(i);
             String label = safeText(choice);
             System.out.println("Click -> " + label);
 
-            int before = Shadow.findAll(R(), reply).size();
+            int beforeReplies = getCurrentBotReplyCount();
+            String oldSig = suggestionSignature();
 
-            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center', inline:'nearest'});", choice);
+            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", choice);
             easyClick(choice);
 
-            new WebDriverWait(driver, Duration.ofSeconds(20))
-                    .ignoring(StaleElementReferenceException.class)
-                    .until(d -> Shadow.findAll(Shadow.getRoot(d), reply).size() > before);
+            String full = waitForNewBotReplyStable(beforeReplies, 900, 25000);
+            if (!full.isEmpty()) System.out.println("Bot: " + full);
 
-            Thread.sleep(700);
+            List<WebElement> next = waitForSuggestionsChange(oldSig, 20000);
+            if (next.isEmpty()) {
+                System.out.println("No next suggestions yet (stopping to avoid timeout).");
+                break;
+            }
+
+            Thread.sleep(500);
         }
     }
 }
