@@ -5,12 +5,14 @@ import java.util.UUID;
 import com.opencsv.CSVReader;
 import java.io.FileReader;
 import static api.Payload.generatePreviewPayload;
+import static constants.Urls.CLIENT_DETAILS_CSV;
+
 public class PreviewTestcases {
 
     public static List<String> getAllPreviewPayloads() throws Exception {
         List<String> payloads = new ArrayList<>();
 
-        try (CSVReader reader = new CSVReader(new FileReader("src/test/resources/clientDetails.csv"))) {
+        try (CSVReader reader = new CSVReader(new FileReader(CLIENT_DETAILS_CSV))) {
             String[] nextLine;
             reader.readNext();
 

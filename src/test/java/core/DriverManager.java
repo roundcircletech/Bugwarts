@@ -8,15 +8,18 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 
 import java.time.Duration;
 
+import static constants.Strings.CHROME;
+import static constants.Strings.FIREFOX;
+
 public class DriverManager {
 
     private static WebDriver driver;
 
     public static WebDriver getDriver() {
         if (driver == null) {
-            String browser = System.getProperty("browser", "firefox").toLowerCase();
+            String browser = System.getProperty("browser", FIREFOX).toLowerCase();
             switch (browser) {
-                case "chrome":
+                case CHROME:
                     ChromeOptions chromeOptions = new ChromeOptions();
                     chromeOptions.addArguments("--headless=new");
                     chromeOptions.addArguments("--window-size=1920,1080");
@@ -28,7 +31,7 @@ public class DriverManager {
                     driver = new ChromeDriver(chromeOptions);
                     break;
 
-                case "firefox":
+                case FIREFOX:
                 default:
                     FirefoxOptions options = new FirefoxOptions();
                     options.addArguments("--headless");
