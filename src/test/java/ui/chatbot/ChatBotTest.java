@@ -11,11 +11,14 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import static constants.DataProviders.CHATBOT_URLS;
+import static constants.Urls.CLIENT_DETAILS_CSV;
+
 public class ChatBotTest extends BaseTest {
 
     private Object[][] getCsvUrls() throws Exception {
         List<String> urls = new ArrayList<>();
-        try (CSVReader reader = new CSVReader(new FileReader("src/test/resources/clientDetails.csv"))) {
+        try (CSVReader reader = new CSVReader(new FileReader(CLIENT_DETAILS_CSV))) {
             String[] row;
             reader.readNext(); // skipping the header
             while ((row = reader.readNext()) != null) {
@@ -29,11 +32,11 @@ public class ChatBotTest extends BaseTest {
         return data;
     }
     //URLs from CSV to tests
-    @DataProvider(name = "chatbotUrls")
+    @DataProvider(name = CHATBOT_URLS)
     public Object[][] provideUrls() throws Exception {
         return getCsvUrls();
     }
-    @Test(dataProvider = "chatbotUrls", priority = 2)
+    @Test(dataProvider = CHATBOT_URLS, priority = 2)
     public void testSites(String urls) throws InterruptedException {
         driver.get(urls);
         ChatBotPage page = new ChatBotPage(driver);

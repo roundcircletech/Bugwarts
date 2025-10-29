@@ -8,6 +8,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
 import java.util.List;
 
+import static constants.Strings.EMPTY_STRING;
+
 public class ChatBotPage {
 
     private WebDriver driver;
@@ -97,7 +99,7 @@ public class ChatBotPage {
         try {
             root = Shadow.getRoot(driver);
             Shadow.find(root, "button.ChatHeader-module_sdkExpandButton__qtONk").click();
-            System.out.println("Expanded");
+            System.out.println("SDK Successfully Expanded");
             Thread.sleep(400);
         } catch (Exception e) {
             System.out.println("Expand failed: " + e.getMessage());
@@ -118,7 +120,7 @@ public class ChatBotPage {
         try {
             root = Shadow.getRoot(driver);
             List<WebElement> items = Shadow.findAll(root, "div[class*='sdkSuggestedQuestionsContainer'] button");
-            System.out.println("Suggestions: " + items.size());
+            System.out.println("No. of Default Suggestive Responses: " + items.size());
             return items.size();
         } catch (Exception e) {
             System.out.println("Suggestions count failed: " + e.getMessage());
@@ -148,11 +150,11 @@ public class ChatBotPage {
             Thread.sleep(9000);
             WebElement last = botReply.get(botReply.size() - 1);
             String text = last.getText().trim();
-            if (!text.isEmpty()) System.out.println("Bot: " + text);
+            if (!text.isEmpty()) System.out.println("Agent: " + text);
             return text;
         } catch (org.openqa.selenium.TimeoutException e) {
-            System.out.println("No bot reply within wait window (continuing)");
-            return "";
+            System.out.println("No agent reply within wait window (continuing)");
+            return EMPTY_STRING;
         }
     }
 
@@ -224,7 +226,7 @@ public class ChatBotPage {
             }
             return sb.toString();
         } catch (Exception e) {
-            return "";
+            return EMPTY_STRING;
         }
     }
 
@@ -248,7 +250,7 @@ public class ChatBotPage {
     private String waitForNewBotReplyStable(int oldCount, long quietMs, long maxWaitMs) {
         long start = System.currentTimeMillis();
         long lastChange = start;
-        String last = "";
+        String last = EMPTY_STRING;
         WebElement latest = null;
 
         while (System.currentTimeMillis() - start < maxWaitMs) {
@@ -260,7 +262,7 @@ public class ChatBotPage {
                     latest = bubbles.get(bubbles.size() - 1);
                     String cur = (String) ((JavascriptExecutor) driver)
                             .executeScript("return arguments[0].innerText || arguments[0].textContent || '';", latest);
-                    cur = (cur == null) ? "" : cur.trim();
+                    cur = (cur == null) ? EMPTY_STRING : cur.trim();
 
                     if (!cur.equals(last)) {
                         last = cur;
@@ -285,7 +287,7 @@ public class ChatBotPage {
     }
 
     private static String safeText(WebElement el) {
-        try { return el.getText().trim(); } catch (Exception e) { return ""; }
+        try { return el.getText().trim(); } catch (Exception e) { return EMPTY_STRING; }
     }
 
     public void clickRandomSuggestions() throws InterruptedException {
@@ -315,7 +317,7 @@ public class ChatBotPage {
             easyClick(choice);
 
             String full = waitForNewBotReplyStable(beforeReplies, 900, 25000);
-            if (!full.isEmpty()) System.out.println("Bot: " + full);
+            if (!full.isEmpty()) System.out.println("Agent: " + full);
 
             List<WebElement> next = waitForSuggestionsChange(oldSig, 20000);
             if (next.isEmpty()) {
