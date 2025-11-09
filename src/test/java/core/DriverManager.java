@@ -40,7 +40,7 @@ public class DriverManager {
                     driver = new FirefoxDriver(options);
                     break;
             }
-            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
         }
         return driver;
     }
