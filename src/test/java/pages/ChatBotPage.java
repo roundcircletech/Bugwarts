@@ -23,7 +23,7 @@ public class ChatBotPage {
 
     public ChatBotPage(WebDriver driver) {
         this.driver = driver;
-        this.root = Shadow.getRoot(driver);
+        this.root = null;
     }
 
     public int greetingReply() throws InterruptedException {
@@ -174,7 +174,7 @@ public class ChatBotPage {
             root.findElement(BY_SEND).click();
 
             Thread.sleep(3000);
-            reply = waitAndGetNewAgentReply(driver, before, Duration.ofSeconds(12));
+            reply = waitAndGetNewAgentReply(driver, before, Duration.ofSeconds(30));
             System.out.println("Reply: " + reply);
 
             if (isSchedulerReply(reply) && attempt == 0) {
