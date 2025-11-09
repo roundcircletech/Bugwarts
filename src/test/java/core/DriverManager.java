@@ -17,7 +17,7 @@ public class DriverManager {
 
     public static WebDriver getDriver() {
         if (driver == null) {
-            String browser = System.getProperty("browser", FIREFOX).toLowerCase();
+            String browser = System.getProperty("browser", CHROME).toLowerCase();
             switch (browser) {
                 case CHROME:
                     ChromeOptions chromeOptions = new ChromeOptions();
@@ -40,7 +40,7 @@ public class DriverManager {
                     driver = new FirefoxDriver(options);
                     break;
             }
-            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
+            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
         }
         return driver;
     }
