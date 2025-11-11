@@ -8,7 +8,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
 import java.util.List;
 
-import static constants.Strings.EMPTY_STRING;
+import static constants.Strings.*;
 
 public class ChatBotPage {
 
@@ -27,12 +27,12 @@ public class ChatBotPage {
     }
 
     public void greetingReply() throws InterruptedException {
-        doGreetingReply(this.driver, "Hi");
+        doGreetingReply(this.driver, GREETING_MSG);
 
     }
 
     public void testValidEmail() throws InterruptedException {
-        doGreetingReply(this.driver, "test@test.com");
+        doGreetingReply(this.driver,INVALID_EMAIL);
 
     }
 
