@@ -31,7 +31,7 @@ public class ChatBotPage {
 
     }
 
-    public void testValidEmail() throws InterruptedException {
+    public void testInvalidEmail() throws InterruptedException {
         doGreetingReply(this.driver,INVALID_EMAIL);
 
     }
