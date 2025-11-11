@@ -49,6 +49,7 @@ public class ChatBotTest extends BaseTest {
         page.scheduleMeeting();
         page.getLastReply();
         page.greetingReply();
+        page.testInvalidEmail();
         page.clickRandomSuggestions();
         page.close();
     }
