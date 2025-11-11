@@ -26,8 +26,14 @@ public class ChatBotPage {
         this.root = null;
     }
 
-    public int greetingReply() throws InterruptedException {
-        return doGreetingReply(this.driver);
+    public void greetingReply() throws InterruptedException {
+        doGreetingReply(this.driver, "Hi");
+
+    }
+
+    public void testValidEmail() throws InterruptedException {
+        doGreetingReply(this.driver, "test@test.com");
+
     }
 
     private static boolean isSchedulerReply(String text) {
@@ -158,7 +164,7 @@ public class ChatBotPage {
         }
     }
 
-    private static int doGreetingReply(WebDriver driver) throws InterruptedException {
+    private static void doGreetingReply(WebDriver driver, String msg) throws InterruptedException {
         waitForMainChatInput(driver, Duration.ofSeconds(10));
 
         String reply;
@@ -169,7 +175,7 @@ public class ChatBotPage {
 
             WebElement chatInput = root.findElement(BY_CHAT_INPUT);
             chatInput.click();
-            chatInput.sendKeys("Hi");
+            chatInput.sendKeys(msg);
 
             root.findElement(BY_SEND).click();
 
@@ -194,7 +200,6 @@ public class ChatBotPage {
         }
 
         System.out.println("Suggestions: " + suggestions);
-        return suggestions;
     }
 
     private List<WebElement> waitForVisibleSuggestions(Duration timeout) {
