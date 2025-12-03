@@ -1,29 +1,14 @@
 package api;
-import java.util.ArrayList;
+import core.CsvUtils;
 import java.util.List;
 import java.util.UUID;
-import com.opencsv.CSVReader;
-import java.io.FileReader;
 import static api.Payload.generatePreviewPayload;
 import static constants.Urls.CLIENT_DETAILS_CSV;
 
 public class PreviewTestcases {
 
     public static List<String> getAllPreviewPayloads() throws Exception {
-        List<String> payloads = new ArrayList<>();
-
-        try (CSVReader reader = new CSVReader(new FileReader(CLIENT_DETAILS_CSV))) {
-            String[] nextLine;
-            reader.readNext();
-
-            while ((nextLine = reader.readNext()) != null) {
-                String clientId = nextLine[0];
-                String origin = nextLine[1];
-                String referer = nextLine[2];
-
-                String payload = generatePreviewPayload(UUID.fromString(clientId), origin, referer);
-                payloads.add(payload);
-            }
-        }
-        return payloads;
+        return CsvUtils.processCsvRows(CLIENT_DETAILS_CSV, true, row ->
+                generatePreviewPayload(UUID.fromString(row[0]), row[1], row[2])
+        );
     }}

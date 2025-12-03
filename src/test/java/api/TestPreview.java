@@ -1,5 +1,6 @@
 package api;
 
+import core.CsvUtils;
 import io.restassured.RestAssured;
 import org.json.JSONObject;
 import org.testng.annotations.BeforeClass;
@@ -19,9 +20,7 @@ public class TestPreview {
 
     @DataProvider(name = PREVIEW_PAYLOAD)
     public Object[][] previewData() throws Exception {
-        return PreviewTestcases.getAllPreviewPayloads().stream()
-                .map(p -> new Object[]{p})
-                .toArray(Object[][]::new);
+        return CsvUtils.toDataProvider(PreviewTestcases.getAllPreviewPayloads());
     }
 
     @Test(dataProvider = PREVIEW_PAYLOAD)
