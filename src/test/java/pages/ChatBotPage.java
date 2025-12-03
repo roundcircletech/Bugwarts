@@ -57,7 +57,7 @@ public class ChatBotPage {
         w.ignoring(NoSuchElementException.class)
                 .ignoring(StaleElementReferenceException.class)
                 .until(d -> {
-                    SearchContext r = d.findElement(BY_HOST).getShadowRoot();
+                    SearchContext r = getShadowRoot(driver);
                     List<WebElement> inputs = r.findElements(BY_CHAT_INPUT);
                     return !inputs.isEmpty() && inputs.get(0).isDisplayed();
                 });
@@ -67,7 +67,7 @@ public class ChatBotPage {
         WebDriverWait wait = new WebDriverWait(driver, timeout);
 
         WebElement bubble = wait.until(d -> {
-            SearchContext r = d.findElement(BY_HOST).getShadowRoot();
+            SearchContext r = getShadowRoot(driver);
             List<WebElement> msgs = r.findElements(BY_AGENT_TEXT);
             return msgs.size() > previousCount ? msgs.get(msgs.size() - 1) : null;
         });
@@ -82,7 +82,7 @@ public class ChatBotPage {
             } else {
                 stableFor += TEXT_CHECK_INTERVAL;
             }
-            try { Thread.sleep(TEXT_CHECK_INTERVAL); } catch (InterruptedException ignored) {}
+            safeSleep(TEXT_CHECK_INTERVAL);
         }
         return text;
     }
@@ -112,24 +112,11 @@ public class ChatBotPage {
     }
 
     public void expand() {
-        try {
-            root = Shadow.getRoot(driver);
-            Shadow.find(root, EXPAND_BUTTON).click();
-            System.out.println(SDK_EXPANDED);
-            Thread.sleep(AFTER_EXPAND_DELAY);
-        } catch (Exception e) {
-            System.out.println(EXPAND_FAILED + e.getMessage());
-        }
+        clickShadowElementWithDelay(EXPAND_BUTTON, AFTER_EXPAND_DELAY, SDK_EXPANDED, EXPAND_FAILED);
     }
 
     public void close() {
-        try {
-            root = Shadow.getRoot(driver);
-            Shadow.find(root, CLOSE_BUTTON).click();
-            System.out.println(CLOSED);
-        } catch (Exception e) {
-            System.out.println(CLOSE_FAILED + e.getMessage());
-        }
+        clickShadowElement(CLOSE_BUTTON, CLOSED, CLOSE_FAILED);
     }
 
     public int getDefaultSuggestionsCount() {
@@ -166,7 +153,7 @@ public class ChatBotPage {
                 return list.isEmpty() ? null : list;
             }, AGENT_REPLY_TIMEOUT);
 
-            Thread.sleep(AGENT_REPLY_DELAY);
+            safeSleep(AGENT_REPLY_DELAY);
             WebElement last = botReply.get(botReply.size() - 1);
             String text = last.getText().trim();
             if (!text.isEmpty()) System.out.println(AGENT_PREFIX + text);
@@ -185,7 +172,7 @@ public class ChatBotPage {
 
         String reply;
         for (int attempt = 0; attempt < MAX_GREETING_RETRIES; attempt++) {
-            SearchContext root = driver.findElement(BY_HOST).getShadowRoot();
+            SearchContext root = getShadowRoot(driver);
 
             int before = root.findElements(BY_AGENT_TEXT).size();
 
@@ -195,7 +182,7 @@ public class ChatBotPage {
 
             root.findElement(BY_SEND).click();
 
-            Thread.sleep(AFTER_SEND_DELAY);
+            safeSleep(AFTER_SEND_DELAY);
             reply = waitAndGetNewAgentReply(driver, before, Duration.ofSeconds(SHADOW_ROOT_TIMEOUT));
             System.out.println(REPLY_PREFIX + reply);
 
@@ -207,11 +194,11 @@ public class ChatBotPage {
             break;
         }
 
-        SearchContext root = driver.findElement(BY_HOST).getShadowRoot();
+        SearchContext root = getShadowRoot(driver);
         int suggestions = root.findElements(BY_SUGGEST).size();
         if (suggestions == 0) {
-            Thread.sleep(SUGGESTIONS_RECHECK_DELAY);
-            root = driver.findElement(BY_HOST).getShadowRoot();
+            safeSleep(SUGGESTIONS_RECHECK_DELAY);
+            root = getShadowRoot(driver);
             suggestions = root.findElements(BY_SUGGEST).size();
         }
 
@@ -230,7 +217,7 @@ public class ChatBotPage {
                 });
                 if (!list.isEmpty()) return list;
             } catch (StaleElementReferenceException | NoSuchElementException ignored) {}
-            try { Thread.sleep(ELEMENT_CHECK_INTERVAL); } catch (InterruptedException ignored) {}
+            safeSleep(ELEMENT_CHECK_INTERVAL);
         }
         return new java.util.ArrayList<>();
     }
@@ -258,7 +245,7 @@ public class ChatBotPage {
             if (!sig.isEmpty() && !sig.equals(oldSig)) {
                 return waitForVisibleSuggestions(Duration.ofSeconds(SUGGESTIONS_CHANGE_TIMEOUT));
             }
-            try { Thread.sleep(TEXT_CHECK_INTERVAL); } catch (InterruptedException ignored) {}
+            safeSleep(TEXT_CHECK_INTERVAL);
         }
         return new java.util.ArrayList<>();
     }
@@ -276,7 +263,7 @@ public class ChatBotPage {
 
         while (System.currentTimeMillis() - start < maxWaitMs) {
             try {
-                SearchContext r = driver.findElement(BY_HOST).getShadowRoot();
+                SearchContext r = getShadowRoot();
                 List<WebElement> bubbles = r.findElements(BY_AGENT_TEXT);
 
                 if (bubbles.size() > oldCount) {
@@ -293,7 +280,7 @@ public class ChatBotPage {
                     }
                 }
             } catch (StaleElementReferenceException | NoSuchElementException ignored) {}
-            try { Thread.sleep(ELEMENT_CHECK_INTERVAL); } catch (InterruptedException ignored) {}
+            safeSleep(ELEMENT_CHECK_INTERVAL);
         }
         return last;
     }
@@ -307,6 +294,48 @@ public class ChatBotPage {
         }
     }
 
+    // ===== REUSABLE UTILITY METHODS =====
+    
+    private static void safeSleep(long milliseconds) {
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException ignored) {}
+    }
+    
+    private SearchContext getShadowRoot() {
+        return driver.findElement(BY_HOST).getShadowRoot();
+    }
+    
+    private static SearchContext getShadowRoot(WebDriver driver) {
+        return driver.findElement(BY_HOST).getShadowRoot();
+    }
+    
+    private void clickShadowElement(String selector, String successMsg, String failureMsg) {
+        try {
+            root = Shadow.getRoot(driver);
+            Shadow.find(root, selector).click();
+            System.out.println(successMsg);
+        } catch (Exception e) {
+            System.out.println(failureMsg + e.getMessage());
+        }
+    }
+    
+    private void clickShadowElementWithDelay(String selector, long delay, String successMsg, String failureMsg) {
+        try {
+            root = Shadow.getRoot(driver);
+            Shadow.find(root, selector).click();
+            safeSleep(delay);
+            System.out.println(successMsg);
+        } catch (Exception e) {
+            System.out.println(failureMsg + e.getMessage());
+        }
+    }
+    
+    private void scrollAndClick(WebElement element) {
+        ((JavascriptExecutor) driver).executeScript(JS_SCROLL_INTO_VIEW, element);
+        easyClick(element);
+    }
+    
     private static String safeText(WebElement el) {
         try { return el.getText().trim(); } catch (Exception e) { return EMPTY_STRING; }
     }
@@ -334,8 +363,7 @@ public class ChatBotPage {
             int beforeReplies = getCurrentBotReplyCount();
             String oldSig = suggestionSignature();
 
-            ((JavascriptExecutor) driver).executeScript(JS_SCROLL_INTO_VIEW, choice);
-            easyClick(choice);
+            scrollAndClick(choice);
 
             String full = waitForNewBotReplyStable(beforeReplies, BOT_REPLY_QUIET_TIME, BOT_REPLY_MAX_WAIT);
             if (!full.isEmpty()) System.out.println(AGENT_PREFIX + full);
@@ -346,7 +374,7 @@ public class ChatBotPage {
                 break;
             }
 
-            Thread.sleep(CLICK_DELAY);
+            safeSleep(CLICK_DELAY);
         }
     }
 }

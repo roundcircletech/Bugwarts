@@ -2,13 +2,11 @@
 package ui.chatbot;
 
 import pages.ChatBotPage;
-import com.opencsv.CSVReader;
 import core.BaseTest;
+import core.CsvUtils;
 import org.testng.annotations.Test;
 import org.testng.Assert;
 import org.testng.annotations.*;
-import java.io.FileReader;
-import java.util.ArrayList;
 import java.util.List;
 
 import static constants.DataProviders.CHATBOT_URLS;
@@ -19,17 +17,8 @@ public class ChatBotTest extends BaseTest {
 
     @DataProvider(name = CHATBOT_URLS)
     public Object[][] provideUrls() throws Exception {
-        List<String> urls = new ArrayList<>();
-        try (CSVReader reader = new CSVReader(new FileReader(CLIENT_DETAILS_CSV))) {
-            reader.readNext(); // skip header
-            String[] row;
-            while ((row = reader.readNext()) != null) {
-                if (row.length > 1 && row[1] != null && !row[1].trim().isEmpty()) {
-                    urls.add(row[1].trim());
-                }
-            }
-        }
-        return urls.stream().map(url -> new Object[]{url}).toArray(Object[][]::new);
+        List<String> urls = CsvUtils.readCsvColumn(CLIENT_DETAILS_CSV, 1, true, true);
+        return CsvUtils.toDataProvider(urls);
     }
     @Test(dataProvider = CHATBOT_URLS, priority = 2)
     public void testSites(String url) throws InterruptedException {
