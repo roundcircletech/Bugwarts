@@ -8,6 +8,8 @@ public class Messages {
     
     // Chat operations
     public static final String CHAT_OPENED = "Chat opened: ";
+    public static final String CHAT_ALREADY_OPEN = "Chat already open (auto-popup): ";
+    public static final String CHAT_RETRY = "Retrying chat open for: ";
     public static final String OPEN_FAILED = "Open failed: ";
     public static final String SDK_EXPANDED = "SDK Successfully Expanded";
     public static final String EXPAND_FAILED = "Expand failed: ";

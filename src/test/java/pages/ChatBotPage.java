@@ -15,7 +15,7 @@ import static constants.Messages.*;
 
 public class ChatBotPage {
 
-    private WebDriver driver;
+    private final WebDriver driver;
     private SearchContext root;
 
     private static final By BY_HOST = By.cssSelector(HOST_COMPONENT);
@@ -102,12 +102,48 @@ public class ChatBotPage {
     }
 
     public void clickChatBot(String url) {
+        // Wait for page to fully load first
+        WebDriverWait pageWait = new WebDriverWait(driver, Duration.ofSeconds(PAGE_LOAD_TIMEOUT));
+        pageWait.until(d -> ((JavascriptExecutor) d).executeScript("return document.readyState").equals("complete"));
+        
+        // Wait for SDK shadow root to be available (allows time for auto-popup SDKs)
+        safeSleep(AUTO_POPUP_WAIT);
+        
+        // Check if chat is already open (auto-popup enabled sites like edgematics)
         try {
-            root = Shadow.getRoot(driver);
-            Shadow.find(root, CHAT_BUTTON).click();
-            System.out.println(CHAT_OPENED + url);
-        } catch (Exception e) {
-            System.out.println(OPEN_FAILED + url + " | " + e.getMessage());
+            SearchContext shadowRoot = getShadowRoot();
+            List<WebElement> chatInputs = shadowRoot.findElements(BY_CHAT_INPUT);
+            if (!chatInputs.isEmpty() && chatInputs.get(0).isDisplayed()) {
+                root = shadowRoot;
+                System.out.println(CHAT_ALREADY_OPEN + url);
+                return;
+            }
+        } catch (Exception ignored) {
+            // Chat not auto-opened, proceed with clicking
+        }
+        
+        // Retry up to 2 times with longer timeout
+        for (int attempt = 0; attempt < 2; attempt++) {
+            try {
+                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(SHADOW_ROOT_TIMEOUT));
+                wait.ignoring(NoSuchElementException.class)
+                    .ignoring(StaleElementReferenceException.class)
+                    .until(d -> {
+                        SearchContext r = getShadowRoot(d);
+                        WebElement btn = r.findElement(By.cssSelector(CHAT_BUTTON));
+                        return btn.isDisplayed() ? btn : null;
+                    }).click();
+                root = getShadowRoot();
+                System.out.println(CHAT_OPENED + url);
+                return;
+            } catch (Exception e) {
+                if (attempt == 0) {
+                    System.out.println(CHAT_RETRY + url);
+                    safeSleep(RETRY_DELAY);
+                } else {
+                    System.out.println(OPEN_FAILED + url + " | " + e.getMessage());
+                }
+            }
         }
     }
 
@@ -140,7 +176,7 @@ public class ChatBotPage {
         } catch (NoSuchSessionException e) {
             System.err.println(BROWSER_SESSION_LOST_SCHEDULER);
             throw e;
-        } catch (Exception e) {
+        } catch (NoSuchElementException | StaleElementReferenceException | InterruptedException e) {
             System.out.println(SCHEDULER_CLICK_FAILED + e.getMessage());
         }
     }
@@ -259,7 +295,6 @@ public class ChatBotPage {
         long start = System.currentTimeMillis();
         long lastChange = start;
         String last = EMPTY_STRING;
-        WebElement latest = null;
 
         while (System.currentTimeMillis() - start < maxWaitMs) {
             try {
@@ -267,7 +302,7 @@ public class ChatBotPage {
                 List<WebElement> bubbles = r.findElements(BY_AGENT_TEXT);
 
                 if (bubbles.size() > oldCount) {
-                    latest = bubbles.get(bubbles.size() - 1);
+                    WebElement latest = bubbles.get(bubbles.size() - 1);
                     String cur = (String) ((JavascriptExecutor) driver)
                             .executeScript(JS_GET_TEXT, latest);
                     cur = (cur == null) ? EMPTY_STRING : cur.trim();

@@ -1,4 +1,3 @@
-
 package ui.chatbot;
 
 import pages.ChatBotPage;
@@ -20,6 +19,7 @@ public class ChatBotTest extends BaseTest {
         List<String> urls = CsvUtils.readCsvColumn(CLIENT_DETAILS_CSV, 1, true, true);
         return CsvUtils.toDataProvider(urls);
     }
+    
     @Test(dataProvider = CHATBOT_URLS, priority = 2)
     public void testSites(String url) throws InterruptedException {
         try {
@@ -39,10 +39,11 @@ public class ChatBotTest extends BaseTest {
             page.testInvalidEmail();
             page.clickRandomSuggestions();
             page.close();
-        } catch (Exception e) {
+        } catch (InterruptedException | RuntimeException | AssertionError e) {
             System.err.println(TEST_FAILED_FOR + url + ": " + e.getMessage());
             throw e;
         }
     }
 
 }
+

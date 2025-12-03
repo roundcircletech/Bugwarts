@@ -25,6 +25,11 @@ public class TimeoutConfig {
     public static final long AFTER_SEND_DELAY = 3000L;
     public static final long AGENT_REPLY_DELAY = 9000L;
     public static final long SUGGESTIONS_RECHECK_DELAY = 600L;
+    public static final long AUTO_POPUP_WAIT = 3000L;
+    public static final long RETRY_DELAY = 2000L;
+    
+    // Page load timeout (in seconds)
+    public static final int PAGE_LOAD_TIMEOUT = 10;
     
     // Retry configuration
     public static final int MAX_GREETING_RETRIES = 2;
