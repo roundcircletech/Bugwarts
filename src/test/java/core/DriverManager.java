@@ -8,8 +8,8 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 
 import java.time.Duration;
 
-import static constants.Strings.CHROME;
-import static constants.Strings.FIREFOX;
+import static constants.Strings.*;
+import static constants.TimeoutConfig.DEFAULT_TIMEOUT;
 
 public class DriverManager {
 
@@ -17,16 +17,15 @@ public class DriverManager {
 
     public static WebDriver getDriver() {
         if (driver == null) {
-            String browser = System.getProperty("browser", CHROME).toLowerCase();
+            String browser = System.getProperty(BROWSER_PROPERTY, CHROME).toLowerCase();
             switch (browser) {
                 case CHROME:
                     ChromeOptions chromeOptions = new ChromeOptions();
-                    chromeOptions.addArguments("--headless=new");
-                    chromeOptions.addArguments("--window-size=1920,1080");
-                    chromeOptions.addArguments("--no-sandbox");
-                    chromeOptions.addArguments("--disable-dev-shm-usage");
-                    chromeOptions.addArguments("--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) " +
-                            "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36");
+                    chromeOptions.addArguments(CHROME_OPTION_HEADLESS);
+                    chromeOptions.addArguments(CHROME_OPTION_WINDOW_SIZE);
+                    chromeOptions.addArguments(CHROME_OPTION_NO_SANDBOX);
+                    chromeOptions.addArguments(CHROME_OPTION_DISABLE_SHM);
+                    chromeOptions.addArguments(CHROME_USER_AGENT);
                     chromeOptions.setAcceptInsecureCerts(true);
                     driver = new ChromeDriver(chromeOptions);
                     break;
@@ -34,13 +33,13 @@ public class DriverManager {
                 case FIREFOX:
                 default:
                     FirefoxOptions options = new FirefoxOptions();
-                    options.addArguments("--headless");
-                    options.addArguments("--width=1920", "--height=1080");
+                    options.addArguments(FIREFOX_OPTION_HEADLESS);
+                    options.addArguments(FIREFOX_OPTION_WIDTH, FIREFOX_OPTION_HEIGHT);
                     options.setAcceptInsecureCerts(true);
                     driver = new FirefoxDriver(options);
                     break;
             }
-            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(DEFAULT_TIMEOUT));
         }
         return driver;
     }

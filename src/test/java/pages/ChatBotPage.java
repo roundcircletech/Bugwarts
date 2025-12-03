@@ -9,37 +9,47 @@ import java.time.Duration;
 import java.util.List;
 
 import static constants.Strings.*;
+import static constants.Selectors.*;
+import static constants.TimeoutConfig.*;
+import static constants.Messages.*;
 
 public class ChatBotPage {
 
     private WebDriver driver;
     private SearchContext root;
 
-    private static final By BY_HOST = By.cssSelector("my-component");
-    private static final By BY_CHAT_INPUT = By.cssSelector("textarea[role='textbox'][aria-label='Chat input']");
-    private static final By BY_SEND = By.cssSelector("button.ChatInputBox-module_sdkSendButton__CLWm6");
-    private static final By BY_AGENT_TEXT = By.cssSelector("div[class*='AiText-module_textContainer']");
-    private static final By BY_SUGGEST = By.cssSelector("h1[class*='suggestiveResponse']");
+    private static final By BY_HOST = By.cssSelector(HOST_COMPONENT);
+    private static final By BY_CHAT_INPUT = By.cssSelector(CHAT_INPUT);
+    private static final By BY_SEND = By.cssSelector(SEND_BUTTON);
+    private static final By BY_AGENT_TEXT = By.cssSelector(AGENT_TEXT);
+    private static final By BY_SUGGEST = By.cssSelector(SUGGESTIONS);
 
     public ChatBotPage(WebDriver driver) {
         this.driver = driver;
-        this.root = null;
     }
 
     public void greetingReply() throws InterruptedException {
-        doGreetingReply(this.driver, GREETING_MSG);
-
+        try {
+            doGreetingReply(this.driver, GREETING_MSG);
+        } catch (NoSuchSessionException e) {
+            System.err.println(BROWSER_SESSION_LOST_GREETING);
+            throw e;
+        }
     }
 
     public void testInvalidEmail() throws InterruptedException {
-        doGreetingReply(this.driver,INVALID_EMAIL);
-
+        try {
+            doGreetingReply(this.driver, INVALID_EMAIL);
+        } catch (NoSuchSessionException e) {
+            System.err.println(BROWSER_SESSION_LOST_EMAIL);
+            throw e;
+        }
     }
 
     private static boolean isSchedulerReply(String text) {
         if (text == null) return false;
         String s = text.toLowerCase();
-        return s.contains("schedule") || s.contains("email address") || s.contains("name and company");
+        return s.contains(KEYWORD_SCHEDULE) || s.contains(KEYWORD_EMAIL_ADDRESS) || s.contains(KEYWORD_NAME_AND_COMPANY);
     }
 
     private static void waitForMainChatInput(WebDriver driver, Duration timeout) {
@@ -64,29 +74,29 @@ public class ChatBotPage {
 
         String text = "", curr;
         long stableFor = 0;
-        while (stableFor < 600) {
+        while (stableFor < TEXT_STABLE_WAIT) {
             curr = bubble.getText().trim();
             if (!curr.equals(text)) {
                 text = curr;
                 stableFor = 0;
             } else {
-                stableFor += 150;
+                stableFor += TEXT_CHECK_INTERVAL;
             }
-            try { Thread.sleep(150); } catch (InterruptedException ignored) {}
+            try { Thread.sleep(TEXT_CHECK_INTERVAL); } catch (InterruptedException ignored) {}
         }
         return text;
     }
 
     public void handleCookies() {
         try {
-            driver.findElement(By.xpath("//div[contains(text(),'Decline')]")).click();
-            System.out.println("Cookies: declined");
-        } catch (NoSuchElementException e1) {
+            driver.findElement(By.xpath(COOKIE_DECLINE_XPATH)).click();
+            System.out.println(COOKIES_DECLINED);
+        } catch (NoSuchElementException ignored1) {
             try {
-                driver.findElement(By.xpath("//div[contains(text(),'Allow Cookies')]")).click();
-                System.out.println("Cookies: accepted");
-            } catch (NoSuchElementException e2) {
-                System.out.println("Cookies: none");
+                driver.findElement(By.xpath(COOKIE_ALLOW_XPATH)).click();
+                System.out.println(COOKIES_ACCEPTED);
+            } catch (NoSuchElementException ignored2) {
+                System.out.println(COOKIES_NONE);
             }
         }
     }
@@ -94,42 +104,42 @@ public class ChatBotPage {
     public void clickChatBot(String url) {
         try {
             root = Shadow.getRoot(driver);
-            Shadow.find(root, "button.ChatButton-module_sdkChatButton__M1mKI").click();
-            System.out.println("Chat opened: " + url);
+            Shadow.find(root, CHAT_BUTTON).click();
+            System.out.println(CHAT_OPENED + url);
         } catch (Exception e) {
-            System.out.println("Open failed: " + url + " | " + e.getMessage());
+            System.out.println(OPEN_FAILED + url + " | " + e.getMessage());
         }
     }
 
     public void expand() {
         try {
             root = Shadow.getRoot(driver);
-            Shadow.find(root, "button.ChatHeader-module_sdkExpandButton__qtONk").click();
-            System.out.println("SDK Successfully Expanded");
-            Thread.sleep(400);
+            Shadow.find(root, EXPAND_BUTTON).click();
+            System.out.println(SDK_EXPANDED);
+            Thread.sleep(AFTER_EXPAND_DELAY);
         } catch (Exception e) {
-            System.out.println("Expand failed: " + e.getMessage());
+            System.out.println(EXPAND_FAILED + e.getMessage());
         }
     }
 
     public void close() {
         try {
             root = Shadow.getRoot(driver);
-            Shadow.find(root, "button.ChatHeader-module_sdkCloseButton__AQvQv").click();
-            System.out.println("Closed");
+            Shadow.find(root, CLOSE_BUTTON).click();
+            System.out.println(CLOSED);
         } catch (Exception e) {
-            System.out.println("Close failed: " + e.getMessage());
+            System.out.println(CLOSE_FAILED + e.getMessage());
         }
     }
 
     public int getDefaultSuggestionsCount() {
         try {
             root = Shadow.getRoot(driver);
-            List<WebElement> items = Shadow.findAll(root, "div[class*='sdkSuggestedQuestionsContainer'] button");
-            System.out.println("No. of Default Suggestive Responses: " + items.size());
+            List<WebElement> items = Shadow.findAll(root, SUGGESTED_QUESTIONS_CONTAINER);
+            System.out.println(SUGGESTIONS_COUNT_PREFIX + items.size());
             return items.size();
         } catch (Exception e) {
-            System.out.println("Suggestions count failed: " + e.getMessage());
+            System.out.println(SUGGESTIONS_COUNT_FAILED + e.getMessage());
             return 0;
         }
     }
@@ -137,11 +147,14 @@ public class ChatBotPage {
     public void scheduleMeeting() {
         try {
             root = Shadow.getRoot(driver);
-            Shadow.find(root, "button.ChatInputBox-module_sdkCalendarButton__r3Rt3").click();
-            Thread.sleep(2000);
-            System.out.println("Scheduler clicked");
+            Shadow.find(root, CALENDAR_BUTTON).click();
+            Thread.sleep(AFTER_SCHEDULER_DELAY);
+            System.out.println(SCHEDULER_CLICKED);
+        } catch (NoSuchSessionException e) {
+            System.err.println(BROWSER_SESSION_LOST_SCHEDULER);
+            throw e;
         } catch (Exception e) {
-            System.out.println("Scheduler click failed: " + e.getMessage());
+            System.out.println(SCHEDULER_CLICK_FAILED + e.getMessage());
         }
     }
 
@@ -149,26 +162,29 @@ public class ChatBotPage {
         try {
             List<WebElement> botReply = Waits.until(driver, d -> {
                 SearchContext r = Shadow.getRoot(d);
-                List<WebElement> list = Shadow.findAll(r, "div[class*='AiText-module_textContainer']");
+                List<WebElement> list = Shadow.findAll(r, AGENT_TEXT);
                 return list.isEmpty() ? null : list;
-            }, 20);
+            }, AGENT_REPLY_TIMEOUT);
 
-            Thread.sleep(9000);
+            Thread.sleep(AGENT_REPLY_DELAY);
             WebElement last = botReply.get(botReply.size() - 1);
             String text = last.getText().trim();
-            if (!text.isEmpty()) System.out.println("Agent: " + text);
+            if (!text.isEmpty()) System.out.println(AGENT_PREFIX + text);
             return text;
         } catch (org.openqa.selenium.TimeoutException e) {
-            System.out.println("No agent reply within wait window (continuing)");
+            System.out.println(NO_AGENT_REPLY);
+            return EMPTY_STRING;
+        } catch (org.openqa.selenium.NoSuchSessionException e) {
+            System.err.println(BROWSER_SESSION_LOST_GENERIC + e.getMessage());
             return EMPTY_STRING;
         }
     }
 
     private static void doGreetingReply(WebDriver driver, String msg) throws InterruptedException {
-        waitForMainChatInput(driver, Duration.ofSeconds(10));
+        waitForMainChatInput(driver, Duration.ofSeconds(CHAT_INPUT_TIMEOUT));
 
         String reply;
-        for (int attempt = 0; attempt < 2; attempt++) {
+        for (int attempt = 0; attempt < MAX_GREETING_RETRIES; attempt++) {
             SearchContext root = driver.findElement(BY_HOST).getShadowRoot();
 
             int before = root.findElements(BY_AGENT_TEXT).size();
@@ -179,13 +195,13 @@ public class ChatBotPage {
 
             root.findElement(BY_SEND).click();
 
-            Thread.sleep(3000);
-            reply = waitAndGetNewAgentReply(driver, before, Duration.ofSeconds(30));
-            System.out.println("Reply: " + reply);
+            Thread.sleep(AFTER_SEND_DELAY);
+            reply = waitAndGetNewAgentReply(driver, before, Duration.ofSeconds(SHADOW_ROOT_TIMEOUT));
+            System.out.println(REPLY_PREFIX + reply);
 
             if (isSchedulerReply(reply) && attempt == 0) {
-                System.out.println("Scheduler: retry");
-                waitForMainChatInput(driver, Duration.ofSeconds(10));
+                System.out.println(SCHEDULER_RETRY);
+                waitForMainChatInput(driver, Duration.ofSeconds(CHAT_INPUT_TIMEOUT));
                 continue;
             }
             break;
@@ -194,12 +210,12 @@ public class ChatBotPage {
         SearchContext root = driver.findElement(BY_HOST).getShadowRoot();
         int suggestions = root.findElements(BY_SUGGEST).size();
         if (suggestions == 0) {
-            Thread.sleep(600);
+            Thread.sleep(SUGGESTIONS_RECHECK_DELAY);
             root = driver.findElement(BY_HOST).getShadowRoot();
             suggestions = root.findElements(BY_SUGGEST).size();
         }
 
-        System.out.println("Suggestions: " + suggestions);
+        System.out.println(SUGGESTIONS_LABEL + suggestions);
     }
 
     private List<WebElement> waitForVisibleSuggestions(Duration timeout) {
@@ -214,7 +230,7 @@ public class ChatBotPage {
                 });
                 if (!list.isEmpty()) return list;
             } catch (StaleElementReferenceException | NoSuchElementException ignored) {}
-            try { Thread.sleep(120); } catch (InterruptedException ignored) {}
+            try { Thread.sleep(ELEMENT_CHECK_INTERVAL); } catch (InterruptedException ignored) {}
         }
         return new java.util.ArrayList<>();
     }
@@ -226,7 +242,7 @@ public class ChatBotPage {
             StringBuilder sb = new StringBuilder();
             for (WebElement e : list) {
                 try {
-                    if (e.isDisplayed()) sb.append(e.getText().trim()).append("|");
+                    if (e.isDisplayed()) sb.append(e.getText().trim()).append(PIPE_SEPARATOR);
                 } catch (Exception ignored) {}
             }
             return sb.toString();
@@ -240,9 +256,9 @@ public class ChatBotPage {
         while (System.currentTimeMillis() < end) {
             String sig = suggestionSignature();
             if (!sig.isEmpty() && !sig.equals(oldSig)) {
-                return waitForVisibleSuggestions(Duration.ofSeconds(5));
+                return waitForVisibleSuggestions(Duration.ofSeconds(SUGGESTIONS_CHANGE_TIMEOUT));
             }
-            try { Thread.sleep(150); } catch (InterruptedException ignored) {}
+            try { Thread.sleep(TEXT_CHECK_INTERVAL); } catch (InterruptedException ignored) {}
         }
         return new java.util.ArrayList<>();
     }
@@ -266,7 +282,7 @@ public class ChatBotPage {
                 if (bubbles.size() > oldCount) {
                     latest = bubbles.get(bubbles.size() - 1);
                     String cur = (String) ((JavascriptExecutor) driver)
-                            .executeScript("return arguments[0].innerText || arguments[0].textContent || '';", latest);
+                            .executeScript(JS_GET_TEXT, latest);
                     cur = (cur == null) ? EMPTY_STRING : cur.trim();
 
                     if (!cur.equals(last)) {
@@ -277,7 +293,7 @@ public class ChatBotPage {
                     }
                 }
             } catch (StaleElementReferenceException | NoSuchElementException ignored) {}
-            try { Thread.sleep(120); } catch (InterruptedException ignored) {}
+            try { Thread.sleep(ELEMENT_CHECK_INTERVAL); } catch (InterruptedException ignored) {}
         }
         return last;
     }
@@ -286,8 +302,8 @@ public class ChatBotPage {
         try {
             el.click();
         } catch (ElementClickInterceptedException e) {
-            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", el);
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", el);
+            ((JavascriptExecutor) driver).executeScript(JS_SCROLL_INTO_VIEW, el);
+            ((JavascriptExecutor) driver).executeScript(JS_CLICK, el);
         }
     }
 
@@ -296,41 +312,41 @@ public class ChatBotPage {
     }
 
     public void clickRandomSuggestions() throws InterruptedException {
-        List<WebElement> sugs = waitForVisibleSuggestions(Duration.ofSeconds(45));
+        List<WebElement> sugs = waitForVisibleSuggestions(Duration.ofSeconds(SUGGESTIONS_TIMEOUT));
         if (sugs.isEmpty()) {
-            System.out.println("No suggestions visible initially, skipping.");
+            System.out.println(NO_SUGGESTIONS_VISIBLE);
             return;
         }
-        System.out.println("Found " + sugs.size() + " suggestive responses");
+        System.out.println(SUGGESTIONS_FOUND + sugs.size() + SUGGESTIONS_SUFFIX);
 
-        int clicks = Math.min(3, sugs.size());
+        int clicks = Math.min(MAX_SUGGESTION_CLICKS, sugs.size());
         for (int i = 0; i < clicks; i++) {
-            sugs = waitForVisibleSuggestions(Duration.ofSeconds(30));
+            sugs = waitForVisibleSuggestions(Duration.ofSeconds(SUGGESTIONS_REFRESH_TIMEOUT));
             if (sugs.isEmpty() || i >= sugs.size()) {
-                System.out.println("No suggestions to click now, stopping.");
+                System.out.println(NO_SUGGESTIONS_NOW);
                 break;
             }
 
             WebElement choice = sugs.get(i);
             String label = safeText(choice);
-            System.out.println("Click -> " + label);
+            System.out.println(CLICK_ARROW + label);
 
             int beforeReplies = getCurrentBotReplyCount();
             String oldSig = suggestionSignature();
 
-            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", choice);
+            ((JavascriptExecutor) driver).executeScript(JS_SCROLL_INTO_VIEW, choice);
             easyClick(choice);
 
-            String full = waitForNewBotReplyStable(beforeReplies, 900, 25000);
-            if (!full.isEmpty()) System.out.println("Agent: " + full);
+            String full = waitForNewBotReplyStable(beforeReplies, BOT_REPLY_QUIET_TIME, BOT_REPLY_MAX_WAIT);
+            if (!full.isEmpty()) System.out.println(AGENT_PREFIX + full);
 
-            List<WebElement> next = waitForSuggestionsChange(oldSig, 20000);
+            List<WebElement> next = waitForSuggestionsChange(oldSig, SUGGESTIONS_CHANGE_WAIT);
             if (next.isEmpty()) {
-                System.out.println("No next suggestions yet (stopping to avoid timeout).");
+                System.out.println(NO_NEXT_SUGGESTIONS);
                 break;
             }
 
-            Thread.sleep(500);
+            Thread.sleep(CLICK_DELAY);
         }
     }
 }
