@@ -24,7 +24,7 @@ public class TimeoutConfig {
     public static final long AFTER_SCHEDULER_DELAY = 2000L;
     public static final long AFTER_SEND_DELAY = 3000L;
     public static final long AGENT_REPLY_DELAY = 9000L;
-    public static final long SUGGESTIONS_RECHECK_DELAY = 600L;
+    public static final long SUGGESTIONS_RECHECK_DELAY = 5000L;
     public static final long AUTO_POPUP_WAIT = 3000L;
     public static final long RETRY_DELAY = 2000L;
     
