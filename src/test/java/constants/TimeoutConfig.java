@@ -33,6 +33,6 @@ public class TimeoutConfig {
     
     // Retry configuration
     public static final int MAX_GREETING_RETRIES = 2;
-    public static final int MAX_SUGGESTION_CLICKS = 3;
+    public static final int MAX_SUGGESTION_CLICKS = 1;
 }
 

@@ -17,6 +17,7 @@ public class ChatBotPage {
 
     private final WebDriver driver;
     private SearchContext root;
+    private boolean schedulerClicked = false;
 
     private static final By BY_HOST = By.cssSelector(HOST_COMPONENT);
     private static final By BY_CHAT_INPUT = By.cssSelector(CHAT_INPUT);
@@ -30,7 +31,7 @@ public class ChatBotPage {
 
     public void greetingReply() throws InterruptedException {
         try {
-            doGreetingReply(this.driver, GREETING_MSG);
+            doGreetingReply(this.driver, GREETING_MSG, schedulerClicked);
         } catch (NoSuchSessionException e) {
             System.err.println(BROWSER_SESSION_LOST_GREETING);
             throw e;
@@ -39,10 +40,44 @@ public class ChatBotPage {
 
     public void testInvalidEmail() throws InterruptedException {
         try {
-            doGreetingReply(this.driver, INVALID_EMAIL);
+            String reply = doGreetingReply(this.driver, INVALID_EMAIL, schedulerClicked);
+            validateInvalidEmailResponse(reply);
         } catch (NoSuchSessionException e) {
             System.err.println(BROWSER_SESSION_LOST_EMAIL);
             throw e;
+        }
+    }
+    
+    private void validateInvalidEmailResponse(String reply) {
+        if (reply == null || reply.isEmpty()) {
+            throw new AssertionError("No response received for invalid email test");
+        }
+        
+        String lowerReply = reply.toLowerCase();
+        boolean emailRejected = lowerReply.contains("invalid") || 
+                                lowerReply.contains("incorrect") || 
+                                lowerReply.contains("not valid") ||
+                                lowerReply.contains("not be valid") ||
+                                lowerReply.contains("not correct") ||
+                                lowerReply.contains("not be correct") ||
+                                lowerReply.contains("issue with") ||
+                                lowerReply.contains("problem with") ||
+                                lowerReply.contains("wrong") ||
+                                lowerReply.contains("error") ||
+                                lowerReply.contains("doesn't look right") ||
+                                lowerReply.contains("unable to verify") ||
+                                lowerReply.contains("cannot verify") ||
+                                lowerReply.contains("please verify") ||
+                                lowerReply.contains("try again") ||
+                                lowerReply.contains("please check") ||
+                                lowerReply.contains("not recognized") ||
+                                lowerReply.contains("not accepted") ||
+                                lowerReply.contains("cannot accept");
+        
+        if (emailRejected) {
+            System.out.println("✓ Invalid email correctly rejected by bot");
+        } else {
+            throw new AssertionError("FAIL: Bot accepted invalid email 'test@test.com' as valid! Response: " + reply);
         }
     }
 
@@ -171,6 +206,7 @@ public class ChatBotPage {
         try {
             root = Shadow.getRoot(driver);
             Shadow.find(root, CALENDAR_BUTTON).click();
+            schedulerClicked = true;
             Thread.sleep(AFTER_SCHEDULER_DELAY);
             System.out.println(SCHEDULER_CLICKED);
         } catch (NoSuchSessionException e) {
@@ -203,10 +239,10 @@ public class ChatBotPage {
         }
     }
 
-    private static void doGreetingReply(WebDriver driver, String msg) throws InterruptedException {
+    private static String doGreetingReply(WebDriver driver, String msg, boolean skipRetry) throws InterruptedException {
         waitForMainChatInput(driver, Duration.ofSeconds(CHAT_INPUT_TIMEOUT));
 
-        String reply;
+        String reply = EMPTY_STRING;
         for (int attempt = 0; attempt < MAX_GREETING_RETRIES; attempt++) {
             SearchContext root = getShadowRoot(driver);
 
@@ -222,7 +258,8 @@ public class ChatBotPage {
             reply = waitAndGetNewAgentReply(driver, before, Duration.ofSeconds(SHADOW_ROOT_TIMEOUT));
             System.out.println(REPLY_PREFIX + reply);
 
-            if (isSchedulerReply(reply) && attempt == 0) {
+            // Skip retry if scheduler was intentionally clicked
+            if (!skipRetry && isSchedulerReply(reply) && attempt == 0) {
                 System.out.println(SCHEDULER_RETRY);
                 waitForMainChatInput(driver, Duration.ofSeconds(CHAT_INPUT_TIMEOUT));
                 continue;
@@ -239,6 +276,7 @@ public class ChatBotPage {
         }
 
         System.out.println(SUGGESTIONS_LABEL + suggestions);
+        return reply;
     }
 
     private List<WebElement> waitForVisibleSuggestions(Duration timeout) {
