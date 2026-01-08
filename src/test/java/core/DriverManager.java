@@ -1,14 +1,24 @@
 package core;
 
+import java.time.Duration;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 
-import java.time.Duration;
-
-import static constants.Strings.*;
+import static constants.Strings.BROWSER_PROPERTY;
+import static constants.Strings.CHROME;
+import static constants.Strings.CHROME_OPTION_DISABLE_SHM;
+import static constants.Strings.CHROME_OPTION_HEADLESS;
+import static constants.Strings.CHROME_OPTION_NO_SANDBOX;
+import static constants.Strings.CHROME_OPTION_WINDOW_SIZE;
+import static constants.Strings.CHROME_USER_AGENT;
+import static constants.Strings.FIREFOX;
+import static constants.Strings.FIREFOX_OPTION_HEADLESS;
+import static constants.Strings.FIREFOX_OPTION_HEIGHT;
+import static constants.Strings.FIREFOX_OPTION_WIDTH;
 import static constants.TimeoutConfig.DEFAULT_TIMEOUT;
 
 public class DriverManager {

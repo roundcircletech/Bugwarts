@@ -1,17 +1,94 @@
 package pages;
 
-import core.Shadow;
-import core.Waits;
-import org.openqa.selenium.*;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
 import java.time.Duration;
 import java.util.List;
 
-import static constants.Strings.*;
-import static constants.Selectors.*;
-import static constants.TimeoutConfig.*;
-import static constants.Messages.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.ElementClickInterceptedException;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.NoSuchSessionException;
+import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import static constants.Messages.AGENT_PREFIX;
+import static constants.Messages.BROWSER_SESSION_LOST_EMAIL;
+import static constants.Messages.BROWSER_SESSION_LOST_GENERIC;
+import static constants.Messages.BROWSER_SESSION_LOST_GREETING;
+import static constants.Messages.BROWSER_SESSION_LOST_SCHEDULER;
+import static constants.Messages.CHAT_ALREADY_OPEN;
+import static constants.Messages.CHAT_OPENED;
+import static constants.Messages.CLICK_ARROW;
+import static constants.Messages.CLOSED;
+import static constants.Messages.CLOSE_FAILED;
+import static constants.Messages.COOKIES_ACCEPTED;
+import static constants.Messages.COOKIES_DECLINED;
+import static constants.Messages.COOKIES_NONE;
+import static constants.Messages.EXPAND_FAILED;
+import static constants.Messages.NO_AGENT_REPLY;
+import static constants.Messages.NO_NEXT_SUGGESTIONS;
+import static constants.Messages.NO_SUGGESTIONS_NOW;
+import static constants.Messages.NO_SUGGESTIONS_VISIBLE;
+import static constants.Messages.OPEN_FAILED;
+import static constants.Messages.REPLY_PREFIX;
+import static constants.Messages.SCHEDULER_CLICKED;
+import static constants.Messages.SCHEDULER_CLICK_FAILED;
+import static constants.Messages.SCHEDULER_RETRY;
+import static constants.Messages.SDK_EXPANDED;
+import static constants.Messages.SUGGESTIONS_COUNT_FAILED;
+import static constants.Messages.SUGGESTIONS_COUNT_PREFIX;
+import static constants.Messages.SUGGESTIONS_FOUND;
+import static constants.Messages.SUGGESTIONS_LABEL;
+import static constants.Messages.SUGGESTIONS_SUFFIX;
+import static constants.Selectors.AGENT_TEXT;
+import static constants.Selectors.CALENDAR_BUTTON;
+import static constants.Selectors.CHAT_BUTTON;
+import static constants.Selectors.CHAT_INPUT;
+import static constants.Selectors.CLOSE_BUTTON;
+import static constants.Selectors.COOKIE_ALLOW_XPATH;
+import static constants.Selectors.COOKIE_DECLINE_XPATH;
+import static constants.Selectors.EXPAND_BUTTON;
+import static constants.Selectors.HOST_COMPONENT;
+import static constants.Selectors.JS_CLICK;
+import static constants.Selectors.JS_GET_TEXT;
+import static constants.Selectors.JS_SCROLL_INTO_VIEW;
+import static constants.Selectors.SEND_BUTTON;
+import static constants.Selectors.SUGGESTED_QUESTIONS_CONTAINER;
+import static constants.Selectors.SUGGESTIONS;
+import static constants.Strings.EMPTY_STRING;
+import static constants.Strings.GREETING_MSG;
+import static constants.Strings.INVALID_EMAIL;
+import static constants.Strings.KEYWORD_EMAIL_ADDRESS;
+import static constants.Strings.KEYWORD_NAME_AND_COMPANY;
+import static constants.Strings.KEYWORD_SCHEDULE;
+import static constants.Strings.PIPE_SEPARATOR;
+import static constants.TimeoutConfig.AFTER_EXPAND_DELAY;
+import static constants.TimeoutConfig.AFTER_SCHEDULER_DELAY;
+import static constants.TimeoutConfig.AFTER_SEND_DELAY;
+import static constants.TimeoutConfig.AGENT_REPLY_DELAY;
+import static constants.TimeoutConfig.AGENT_REPLY_TIMEOUT;
+import static constants.TimeoutConfig.AUTO_POPUP_WAIT;
+import static constants.TimeoutConfig.BOT_REPLY_MAX_WAIT;
+import static constants.TimeoutConfig.BOT_REPLY_QUIET_TIME;
+import static constants.TimeoutConfig.CHAT_INPUT_TIMEOUT;
+import static constants.TimeoutConfig.CLICK_DELAY;
+import static constants.TimeoutConfig.ELEMENT_CHECK_INTERVAL;
+import static constants.TimeoutConfig.MAX_GREETING_RETRIES;
+import static constants.TimeoutConfig.MAX_SUGGESTION_CLICKS;
+import static constants.TimeoutConfig.PAGE_LOAD_TIMEOUT;
+import static constants.TimeoutConfig.SHADOW_ROOT_TIMEOUT;
+import static constants.TimeoutConfig.SUGGESTIONS_CHANGE_TIMEOUT;
+import static constants.TimeoutConfig.SUGGESTIONS_CHANGE_WAIT;
+import static constants.TimeoutConfig.SUGGESTIONS_RECHECK_DELAY;
+import static constants.TimeoutConfig.SUGGESTIONS_REFRESH_TIMEOUT;
+import static constants.TimeoutConfig.SUGGESTIONS_TIMEOUT;
+import static constants.TimeoutConfig.TEXT_CHECK_INTERVAL;
+import static constants.TimeoutConfig.TEXT_STABLE_WAIT;
+import core.Shadow;
+import core.Waits;
 
 public class ChatBotPage {
 
@@ -60,11 +137,15 @@ public class ChatBotPage {
                                 lowerReply.contains("not be valid") ||
                                 lowerReply.contains("not correct") ||
                                 lowerReply.contains("not be correct") ||
+                                lowerReply.contains("may not") ||
+                                lowerReply.contains("appears") ||
+                                lowerReply.contains("isn't valid") ||
+                                lowerReply.contains("isn't correct") ||
                                 lowerReply.contains("issue with") ||
                                 lowerReply.contains("problem with") ||
                                 lowerReply.contains("wrong") ||
                                 lowerReply.contains("error") ||
-                                lowerReply.contains("doesn't look right") ||
+                                lowerReply.contains("doesn't look") ||
                                 lowerReply.contains("unable to verify") ||
                                 lowerReply.contains("cannot verify") ||
                                 lowerReply.contains("please verify") ||
@@ -157,28 +238,31 @@ public class ChatBotPage {
             // Chat not auto-opened, proceed with clicking
         }
         
-        // Retry up to 2 times with longer timeout
-        for (int attempt = 0; attempt < 2; attempt++) {
+        // Try to click chat button (shorter timeout since auto-popup might have opened it)
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            wait.ignoring(NoSuchElementException.class)
+                .ignoring(StaleElementReferenceException.class)
+                .until(d -> {
+                    SearchContext r = getShadowRoot(d);
+                    WebElement btn = r.findElement(By.cssSelector(CHAT_BUTTON));
+                    return btn.isDisplayed() ? btn : null;
+                }).click();
+            root = getShadowRoot();
+            System.out.println(CHAT_OPENED + url);
+            return;
+        } catch (Exception e) {
+            // Button click failed - check if chat is already open (late auto-popup)
             try {
-                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(SHADOW_ROOT_TIMEOUT));
-                wait.ignoring(NoSuchElementException.class)
-                    .ignoring(StaleElementReferenceException.class)
-                    .until(d -> {
-                        SearchContext r = getShadowRoot(d);
-                        WebElement btn = r.findElement(By.cssSelector(CHAT_BUTTON));
-                        return btn.isDisplayed() ? btn : null;
-                    }).click();
-                root = getShadowRoot();
-                System.out.println(CHAT_OPENED + url);
-                return;
-            } catch (Exception e) {
-                if (attempt == 0) {
-                    System.out.println(CHAT_RETRY + url);
-                    safeSleep(RETRY_DELAY);
-                } else {
-                    System.out.println(OPEN_FAILED + url + " | " + e.getMessage());
+                SearchContext shadowRoot = getShadowRoot();
+                List<WebElement> chatInputs = shadowRoot.findElements(BY_CHAT_INPUT);
+                if (!chatInputs.isEmpty() && chatInputs.get(0).isDisplayed()) {
+                    root = shadowRoot;
+                    System.out.println(CHAT_ALREADY_OPEN + url);
+                    return;
                 }
-            }
+            } catch (Exception ignored) {}
+            System.out.println(OPEN_FAILED + url + " | " + e.getMessage());
         }
     }
 
