@@ -10,7 +10,7 @@ public class Strings {
     public static final String BROWSER_PROPERTY = "browser";
     
     // Test data
-    public static final String GREETING_MSG = "Hi";
+    public static final String GREETING_MSG = "Hi Agent, I am Avishi!";
     public static final String INVALID_EMAIL = "test@test.com";
     
     // Scheduler keywords
