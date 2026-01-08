@@ -247,11 +247,10 @@ public class ChatBotPage {
                     SearchContext r = getShadowRoot(d);
                     WebElement btn = r.findElement(By.cssSelector(CHAT_BUTTON));
                     return btn.isDisplayed() ? btn : null;
-                }).click();
-            root = getShadowRoot();
-            System.out.println(CHAT_OPENED + url);
-            return;
-        } catch (Exception e) {
+            }).click();
+        root = getShadowRoot();
+        System.out.println(CHAT_OPENED + url);
+    } catch (Exception e) {
             // Button click failed - check if chat is already open (late auto-popup)
             try {
                 SearchContext shadowRoot = getShadowRoot();
