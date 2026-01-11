@@ -73,6 +73,7 @@ import static constants.TimeoutConfig.AGENT_REPLY_TIMEOUT;
 import static constants.TimeoutConfig.AUTO_POPUP_WAIT;
 import static constants.TimeoutConfig.BOT_REPLY_MAX_WAIT;
 import static constants.TimeoutConfig.BOT_REPLY_QUIET_TIME;
+import static constants.TimeoutConfig.CHAT_BUTTON_TIMEOUT;
 import static constants.TimeoutConfig.CHAT_INPUT_TIMEOUT;
 import static constants.TimeoutConfig.CLICK_DELAY;
 import static constants.TimeoutConfig.ELEMENT_CHECK_INTERVAL;
@@ -130,7 +131,8 @@ public class ChatBotPage {
             throw new AssertionError("No response received for invalid email test");
         }
         
-        String lowerReply = reply.toLowerCase();
+        // Normalize curly/smart apostrophes to straight apostrophes for consistent matching
+        String lowerReply = reply.toLowerCase().replace("'", "'").replace("'", "'");
         boolean emailRejected = lowerReply.contains("invalid") || 
                                 lowerReply.contains("incorrect") || 
                                 lowerReply.contains("not valid") ||
@@ -158,7 +160,7 @@ public class ChatBotPage {
         if (emailRejected) {
             System.out.println("✓ Invalid email correctly rejected by bot");
         } else {
-            throw new AssertionError("FAIL: Bot accepted invalid email 'test@test.com' as valid! Response: " + reply);
+            throw new AssertionError("FAIL: Bot accepted invalid email '" + INVALID_EMAIL + "' as valid! Response: " + reply);
         }
     }
 
@@ -240,7 +242,7 @@ public class ChatBotPage {
         
         // Try to click chat button (shorter timeout since auto-popup might have opened it)
         try {
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(CHAT_BUTTON_TIMEOUT));
             wait.ignoring(NoSuchElementException.class)
                 .ignoring(StaleElementReferenceException.class)
                 .until(d -> {

@@ -11,12 +11,10 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 import static constants.Strings.BROWSER_PROPERTY;
 import static constants.Strings.CHROME;
 import static constants.Strings.CHROME_OPTION_DISABLE_SHM;
-import static constants.Strings.CHROME_OPTION_HEADLESS;
 import static constants.Strings.CHROME_OPTION_NO_SANDBOX;
 import static constants.Strings.CHROME_OPTION_WINDOW_SIZE;
 import static constants.Strings.CHROME_USER_AGENT;
 import static constants.Strings.FIREFOX;
-import static constants.Strings.FIREFOX_OPTION_HEADLESS;
 import static constants.Strings.FIREFOX_OPTION_HEIGHT;
 import static constants.Strings.FIREFOX_OPTION_WIDTH;
 import static constants.TimeoutConfig.DEFAULT_TIMEOUT;
@@ -31,7 +29,7 @@ public class DriverManager {
             switch (browser) {
                 case CHROME:
                     ChromeOptions chromeOptions = new ChromeOptions();
-                    chromeOptions.addArguments(CHROME_OPTION_HEADLESS);
+                    
                     chromeOptions.addArguments(CHROME_OPTION_WINDOW_SIZE);
                     chromeOptions.addArguments(CHROME_OPTION_NO_SANDBOX);
                     chromeOptions.addArguments(CHROME_OPTION_DISABLE_SHM);
@@ -43,7 +41,7 @@ public class DriverManager {
                 case FIREFOX:
                 default:
                     FirefoxOptions options = new FirefoxOptions();
-                    options.addArguments(FIREFOX_OPTION_HEADLESS);
+                    
                     options.addArguments(FIREFOX_OPTION_WIDTH, FIREFOX_OPTION_HEIGHT);
                     options.setAcceptInsecureCerts(true);
                     driver = new FirefoxDriver(options);
