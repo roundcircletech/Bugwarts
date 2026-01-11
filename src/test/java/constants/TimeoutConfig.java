@@ -5,7 +5,7 @@ public class TimeoutConfig {
     public static final int DEFAULT_TIMEOUT = 10;
     public static final int SHADOW_ROOT_TIMEOUT = 30;
     public static final int AGENT_REPLY_TIMEOUT = 20;
-    public static final int CHAT_INPUT_TIMEOUT = 10;
+    public static final int CHAT_INPUT_TIMEOUT = 20;
     public static final int SUGGESTIONS_TIMEOUT = 45;
     public static final int SUGGESTIONS_REFRESH_TIMEOUT = 30;
     public static final int SUGGESTIONS_CHANGE_TIMEOUT = 5;
@@ -25,11 +25,12 @@ public class TimeoutConfig {
     public static final long AFTER_SEND_DELAY = 3000L;
     public static final long AGENT_REPLY_DELAY = 9000L;
     public static final long SUGGESTIONS_RECHECK_DELAY = 5000L;
-    public static final long AUTO_POPUP_WAIT = 3000L;
+    public static final long AUTO_POPUP_WAIT = 8000L;
     public static final long RETRY_DELAY = 2000L;
     
     // Page load timeout (in seconds)
-    public static final int PAGE_LOAD_TIMEOUT = 10;
+    public static final int PAGE_LOAD_TIMEOUT = 30;
+    public static final int CHAT_BUTTON_TIMEOUT = 15;
     
     // Retry configuration
     public static final int MAX_GREETING_RETRIES = 2;

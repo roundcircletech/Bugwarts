@@ -11,7 +11,7 @@ public class Strings {
     
     // Test data
     public static final String GREETING_MSG = "Hi Agent, I am Avishi!";
-    public static final String INVALID_EMAIL = "test@test.com";
+    public static final String INVALID_EMAIL = "testinvalid1234@test.com";
     
     // Scheduler keywords
     public static final String KEYWORD_SCHEDULE = "schedule";

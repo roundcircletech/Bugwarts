@@ -1,16 +1,17 @@
 package ui.chatbot;
 
-import pages.ChatBotPage;
-import core.BaseTest;
-import core.CsvUtils;
-import org.testng.annotations.Test;
-import org.testng.Assert;
-import org.testng.annotations.*;
 import java.util.List;
 
+import org.testng.Assert;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
 import static constants.DataProviders.CHATBOT_URLS;
-import static constants.Urls.CLIENT_DETAILS_CSV;
 import static constants.Messages.TEST_FAILED_FOR;
+import static constants.Urls.CLIENT_DETAILS_CSV;
+import core.BaseTest;
+import core.CsvUtils;
+import pages.ChatBotPage;
 
 public class ChatBotTest extends BaseTest {
 
@@ -24,21 +25,21 @@ public class ChatBotTest extends BaseTest {
     public void testSites(String url) throws InterruptedException {
         try {
             driver.get(url);
-            ChatBotPage page = new ChatBotPage(driver);
+        ChatBotPage page = new ChatBotPage(driver);
 
-            page.handleCookies();
+        page.handleCookies();
             page.clickChatBot(url);
-            page.expand();
+        page.expand();
             
-            int suggestions = page.getDefaultSuggestionsCount();
+        int suggestions = page.getDefaultSuggestionsCount();
             Assert.assertEquals(suggestions, 3, "Suggestions mismatch for " + url);
             
-            page.scheduleMeeting();
-            page.getLastReply();
             page.greetingReply();
-            page.testInvalidEmail();
-            page.clickRandomSuggestions();
-            page.close();
+        page.scheduleMeeting();
+        page.getLastReply();
+        page.testInvalidEmail();
+        page.clickRandomSuggestions();
+        page.close();
         } catch (InterruptedException | RuntimeException | AssertionError e) {
             System.err.println(TEST_FAILED_FOR + url + ": " + e.getMessage());
             throw e;
