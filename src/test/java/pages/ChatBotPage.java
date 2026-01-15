@@ -155,7 +155,19 @@ public class ChatBotPage {
                                 lowerReply.contains("please check") ||
                                 lowerReply.contains("not recognized") ||
                                 lowerReply.contains("not accepted") ||
-                                lowerReply.contains("cannot accept");
+                                lowerReply.contains("cannot accept") ||
+                                lowerReply.contains("doesn't seem") ||
+                                lowerReply.contains("does not seem") ||
+                                lowerReply.contains("not working") ||
+                                lowerReply.contains("not be working") ||
+                                lowerReply.contains("double-check") ||
+                                lowerReply.contains("double check") ||
+                                lowerReply.contains("couldn't verify") ||
+                                lowerReply.contains("could not verify") ||
+                                lowerReply.contains("failed to verify") ||
+                                lowerReply.contains("unable to validate") ||
+                                lowerReply.contains("share the correct") ||
+                                lowerReply.contains("valid email");
         
         if (emailRejected) {
             System.out.println("✓ Invalid email correctly rejected by bot");

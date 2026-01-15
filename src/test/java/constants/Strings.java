@@ -26,7 +26,12 @@ public class Strings {
     public static final String CHROME_OPTION_WINDOW_SIZE = "--window-size=1920,1080";
     public static final String CHROME_OPTION_NO_SANDBOX = "--no-sandbox";
     public static final String CHROME_OPTION_DISABLE_SHM = "--disable-dev-shm-usage";
-    public static final String CHROME_USER_AGENT = "--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36";
+    // Realistic Windows user agent (more common, harder to detect as bot)
+    public static final String CHROME_USER_AGENT = "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+    // Anti-detection options
+    public static final String CHROME_DISABLE_AUTOMATION = "--disable-blink-features=AutomationControlled";
+    public static final String CHROME_DISABLE_GPU = "--disable-gpu";
+    public static final String CHROME_REMOTE_DEBUGGING = "--remote-debugging-port=9222";
     
     public static final String FIREFOX_OPTION_HEADLESS = "--headless";
     public static final String FIREFOX_OPTION_WIDTH = "--width=1920";
