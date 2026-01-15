@@ -10,6 +10,8 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 
 import static constants.Strings.BROWSER_PROPERTY;
 import static constants.Strings.CHROME;
+import static constants.Strings.CHROME_DISABLE_AUTOMATION;
+import static constants.Strings.CHROME_DISABLE_GPU;
 import static constants.Strings.CHROME_OPTION_DISABLE_SHM;
 import static constants.Strings.CHROME_OPTION_HEADLESS;
 import static constants.Strings.CHROME_OPTION_NO_SANDBOX;
@@ -32,11 +34,19 @@ public class DriverManager {
                 case CHROME:
                     ChromeOptions chromeOptions = new ChromeOptions();
                     
+                    // Headless mode for CI
                     chromeOptions.addArguments(CHROME_OPTION_HEADLESS);
                     chromeOptions.addArguments(CHROME_OPTION_WINDOW_SIZE);
                     chromeOptions.addArguments(CHROME_OPTION_NO_SANDBOX);
                     chromeOptions.addArguments(CHROME_OPTION_DISABLE_SHM);
+                    chromeOptions.addArguments(CHROME_DISABLE_GPU);
+                    
+                    // Anti-detection: realistic user agent + hide automation
                     chromeOptions.addArguments(CHROME_USER_AGENT);
+                    chromeOptions.addArguments(CHROME_DISABLE_AUTOMATION);
+                    chromeOptions.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
+                    chromeOptions.setExperimentalOption("useAutomationExtension", false);
+                    
                     chromeOptions.setAcceptInsecureCerts(true);
                     driver = new ChromeDriver(chromeOptions);
                     break;
