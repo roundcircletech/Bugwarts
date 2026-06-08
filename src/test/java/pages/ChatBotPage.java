@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementClickInterceptedException;
+import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NoSuchSessionException;
@@ -52,6 +53,17 @@ import static constants.Selectors.COOKIE_ALLOW_XPATH;
 import static constants.Selectors.COOKIE_DECLINE_XPATH;
 import static constants.Selectors.EXPAND_BUTTON;
 import static constants.Selectors.HOST_COMPONENT;
+import static constants.Selectors.INCREFF_CALENDAR_BUTTON;
+import static constants.Selectors.INCREFF_CHAT_INPUT;
+import static constants.Selectors.INCREFF_CLOSE_BUTTON;
+import static constants.Selectors.INCREFF_COOKIE_ACCEPT_XPATH;
+import static constants.Selectors.INCREFF_COOKIE_REJECT_XPATH;
+import static constants.Selectors.INCREFF_EXPAND_BUTTON;
+import static constants.Selectors.INCREFF_FLOATING_BAR_INPUT;
+import static constants.Selectors.INCREFF_FLOATING_BAR_OPEN;
+import static constants.Selectors.INCREFF_SEND_BUTTON;
+import static constants.Selectors.INCREFF_SUGGESTED_QUESTIONS_CONTAINER;
+import static constants.Selectors.INCREFF_SUGGESTIONS;
 import static constants.Selectors.JS_CLICK;
 import static constants.Selectors.JS_GET_TEXT;
 import static constants.Selectors.JS_SCROLL_INTO_VIEW;
@@ -93,18 +105,110 @@ import core.Waits;
 
 public class ChatBotPage {
 
+    private static final String INCREFF_HOST = "increff.com";
+
     private final WebDriver driver;
     private SearchContext root;
     private boolean schedulerClicked = false;
+    private String siteUrl = EMPTY_STRING;
 
     private static final By BY_HOST = By.cssSelector(HOST_COMPONENT);
     private static final By BY_CHAT_INPUT = By.cssSelector(CHAT_INPUT);
     private static final By BY_SEND = By.cssSelector(SEND_BUTTON);
     private static final By BY_AGENT_TEXT = By.cssSelector(AGENT_TEXT);
     private static final By BY_SUGGEST = By.cssSelector(SUGGESTIONS);
+    private static final By BY_INCREFF_CHAT_INPUT = By.cssSelector(INCREFF_CHAT_INPUT);
+    private static final By BY_INCREFF_SEND = By.cssSelector(INCREFF_SEND_BUTTON);
+    private static final By BY_INCREFF_FLOATING_BAR_INPUT = By.cssSelector(INCREFF_FLOATING_BAR_INPUT);
+    private static final By BY_INCREFF_FLOATING_BAR_OPEN = By.cssSelector(INCREFF_FLOATING_BAR_OPEN);
+    private static final By BY_INCREFF_SUGGEST = By.cssSelector(INCREFF_SUGGESTIONS);
 
     public ChatBotPage(WebDriver driver) {
         this.driver = driver;
+    }
+
+    private boolean isIncreffSite() {
+        return siteUrl.contains(INCREFF_HOST);
+    }
+
+    private static boolean isIncreffUrl(String url) {
+        return url != null && url.contains(INCREFF_HOST);
+    }
+
+    private static boolean isIncreffChatReady(SearchContext shadowRoot) {
+        List<WebElement> textareas = shadowRoot.findElements(BY_INCREFF_CHAT_INPUT);
+        if (!textareas.isEmpty() && textareas.get(0).isDisplayed()) {
+            return true;
+        }
+        List<WebElement> floatingInputs = shadowRoot.findElements(BY_INCREFF_FLOATING_BAR_INPUT);
+        if (!floatingInputs.isEmpty() && floatingInputs.get(0).isDisplayed()) {
+            return true;
+        }
+        List<WebElement> openButtons = shadowRoot.findElements(BY_INCREFF_FLOATING_BAR_OPEN);
+        return !openButtons.isEmpty() && openButtons.get(0).isDisplayed();
+    }
+
+    private void openIncreffFullChat() {
+        if (!isIncreffSite()) {
+            return;
+        }
+
+        try {
+            SearchContext shadowRoot = Shadow.getRoot(driver);
+            List<WebElement> textareas = shadowRoot.findElements(BY_INCREFF_CHAT_INPUT);
+            if (!textareas.isEmpty() && textareas.get(0).isDisplayed()) {
+                root = shadowRoot;
+                return;
+            }
+
+            List<WebElement> openButtons = shadowRoot.findElements(BY_INCREFF_FLOATING_BAR_OPEN);
+            if (!openButtons.isEmpty() && openButtons.get(0).isDisplayed()) {
+                openButtons.get(0).click();
+                safeSleep(AFTER_EXPAND_DELAY);
+            }
+            root = shadowRoot;
+        } catch (NoSuchSessionException e) {
+            throw e;
+        } catch (Exception ignored) {
+            // Floating bar may already be expanded
+        }
+    }
+
+    private void clickIncreffChatBot(String url) {
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(SHADOW_ROOT_TIMEOUT));
+            root = wait.ignoring(NoSuchElementException.class)
+                    .ignoring(StaleElementReferenceException.class)
+                    .until(d -> {
+                        SearchContext shadowRoot = Shadow.getRoot(d);
+                        return isIncreffChatReady(shadowRoot) ? shadowRoot : null;
+                    });
+            System.out.println(CHAT_ALREADY_OPEN + url);
+        } catch (NoSuchSessionException e) {
+            throw e;
+        } catch (Exception e) {
+            System.out.println(OPEN_FAILED + url + " | " + e.getMessage());
+        }
+    }
+
+    private boolean tryIncreffCookies() {
+        if (!isIncreffUrl(driver.getCurrentUrl())) {
+            return false;
+        }
+
+        try {
+            driver.findElement(By.xpath(INCREFF_COOKIE_REJECT_XPATH)).click();
+            System.out.println(COOKIES_DECLINED);
+            return true;
+        } catch (NoSuchElementException ignored1) {
+            try {
+                driver.findElement(By.xpath(INCREFF_COOKIE_ACCEPT_XPATH)).click();
+                System.out.println(COOKIES_ACCEPTED);
+                return true;
+            } catch (NoSuchElementException ignored2) {
+                return false;
+            }
+        }
     }
 
     public void greetingReply() throws InterruptedException {
@@ -183,12 +287,26 @@ public class ChatBotPage {
     }
 
     private static void waitForMainChatInput(WebDriver driver, Duration timeout) {
+        boolean increff = isIncreffUrl(driver.getCurrentUrl());
+        By inputSelector = increff ? BY_INCREFF_CHAT_INPUT : BY_CHAT_INPUT;
+
         WebDriverWait w = new WebDriverWait(driver, timeout);
         w.ignoring(NoSuchElementException.class)
                 .ignoring(StaleElementReferenceException.class)
                 .until(d -> {
                     SearchContext r = getShadowRoot(driver);
-                    List<WebElement> inputs = r.findElements(BY_CHAT_INPUT);
+                    if (increff) {
+                        List<WebElement> textareas = r.findElements(BY_INCREFF_CHAT_INPUT);
+                        if (!textareas.isEmpty() && textareas.get(0).isDisplayed()) {
+                            return true;
+                        }
+                        List<WebElement> openButtons = r.findElements(BY_INCREFF_FLOATING_BAR_OPEN);
+                        if (!openButtons.isEmpty() && openButtons.get(0).isDisplayed()) {
+                            openButtons.get(0).click();
+                            safeSleep(AFTER_EXPAND_DELAY);
+                        }
+                    }
+                    List<WebElement> inputs = r.findElements(inputSelector);
                     return !inputs.isEmpty() && inputs.get(0).isDisplayed();
                 });
     }
@@ -226,18 +344,27 @@ public class ChatBotPage {
                 driver.findElement(By.xpath(COOKIE_ALLOW_XPATH)).click();
                 System.out.println(COOKIES_ACCEPTED);
             } catch (NoSuchElementException ignored2) {
-                System.out.println(COOKIES_NONE);
+                if (!tryIncreffCookies()) {
+                    System.out.println(COOKIES_NONE);
+                }
             }
         }
     }
 
     public void clickChatBot(String url) {
+        siteUrl = url;
+
         // Wait for page to fully load first
         WebDriverWait pageWait = new WebDriverWait(driver, Duration.ofSeconds(PAGE_LOAD_TIMEOUT));
         pageWait.until(d -> ((JavascriptExecutor) d).executeScript("return document.readyState").equals("complete"));
         
         // Wait for SDK shadow root to be available (allows time for auto-popup SDKs)
         safeSleep(AUTO_POPUP_WAIT);
+
+        if (isIncreffSite()) {
+            clickIncreffChatBot(url);
+            return;
+        }
         
         // Check if chat is already open (auto-popup enabled sites like edgematics)
         try {
@@ -280,17 +407,58 @@ public class ChatBotPage {
     }
 
     public void expand() {
+        if (isIncreffSite()) {
+            openIncreffFullChat();
+            clickShadowElementWithDelay(INCREFF_EXPAND_BUTTON, AFTER_EXPAND_DELAY, SDK_EXPANDED, EXPAND_FAILED);
+            return;
+        }
         clickShadowElementWithDelay(EXPAND_BUTTON, AFTER_EXPAND_DELAY, SDK_EXPANDED, EXPAND_FAILED);
     }
 
     public void close() {
+        if (isIncreffSite()) {
+            closeIncreffChat();
+            return;
+        }
         clickShadowElement(CLOSE_BUTTON, CLOSED, CLOSE_FAILED);
+    }
+
+    private void closeIncreffChat() {
+        try {
+            root = Shadow.getRoot(driver);
+            List<WebElement> buttons = Shadow.findAll(root, INCREFF_CLOSE_BUTTON);
+            for (WebElement btn : buttons) {
+                try {
+                    if (!btn.isDisplayed() || !btn.isEnabled()) {
+                        continue;
+                    }
+                    clickWithJsFallback(btn);
+                    System.out.println(CLOSED);
+                    return;
+                } catch (Exception ignored) {
+                    // Try next visible close button
+                }
+            }
+            System.out.println(CLOSE_FAILED + "no visible close button");
+        } catch (Exception e) {
+            System.out.println(CLOSE_FAILED + e.getMessage());
+        }
+    }
+
+    private void clickWithJsFallback(WebElement el) {
+        try {
+            el.click();
+        } catch (ElementNotInteractableException e) {
+            ((JavascriptExecutor) driver).executeScript(JS_SCROLL_INTO_VIEW, el);
+            ((JavascriptExecutor) driver).executeScript(JS_CLICK, el);
+        }
     }
 
     public int getDefaultSuggestionsCount() {
         try {
             root = Shadow.getRoot(driver);
-            List<WebElement> items = Shadow.findAll(root, SUGGESTED_QUESTIONS_CONTAINER);
+            String selector = isIncreffSite() ? INCREFF_SUGGESTED_QUESTIONS_CONTAINER : SUGGESTED_QUESTIONS_CONTAINER;
+            List<WebElement> items = Shadow.findAll(root, selector);
             System.out.println(SUGGESTIONS_COUNT_PREFIX + items.size());
             return items.size();
         } catch (Exception e) {
@@ -302,7 +470,8 @@ public class ChatBotPage {
     public void scheduleMeeting() {
         try {
             root = Shadow.getRoot(driver);
-            Shadow.find(root, CALENDAR_BUTTON).click();
+            String selector = isIncreffSite() ? INCREFF_CALENDAR_BUTTON : CALENDAR_BUTTON;
+            Shadow.find(root, selector).click();
             schedulerClicked = true;
             Thread.sleep(AFTER_SCHEDULER_DELAY);
             System.out.println(SCHEDULER_CLICKED);
@@ -339,17 +508,22 @@ public class ChatBotPage {
     private static String doGreetingReply(WebDriver driver, String msg, boolean skipRetry) throws InterruptedException {
         waitForMainChatInput(driver, Duration.ofSeconds(CHAT_INPUT_TIMEOUT));
 
+        boolean increff = isIncreffUrl(driver.getCurrentUrl());
+        By chatInputSelector = increff ? BY_INCREFF_CHAT_INPUT : BY_CHAT_INPUT;
+        By sendSelector = increff ? BY_INCREFF_SEND : BY_SEND;
+        By suggestSelector = increff ? BY_INCREFF_SUGGEST : BY_SUGGEST;
+
         String reply = EMPTY_STRING;
         for (int attempt = 0; attempt < MAX_GREETING_RETRIES; attempt++) {
             SearchContext root = getShadowRoot(driver);
 
             int before = root.findElements(BY_AGENT_TEXT).size();
 
-            WebElement chatInput = root.findElement(BY_CHAT_INPUT);
+            WebElement chatInput = root.findElement(chatInputSelector);
             chatInput.click();
             chatInput.sendKeys(msg);
 
-            root.findElement(BY_SEND).click();
+            root.findElement(sendSelector).click();
 
             safeSleep(AFTER_SEND_DELAY);
             reply = waitAndGetNewAgentReply(driver, before, Duration.ofSeconds(SHADOW_ROOT_TIMEOUT));
@@ -365,11 +539,11 @@ public class ChatBotPage {
         }
 
         SearchContext root = getShadowRoot(driver);
-        int suggestions = root.findElements(BY_SUGGEST).size();
+        int suggestions = root.findElements(suggestSelector).size();
         if (suggestions == 0) {
             safeSleep(SUGGESTIONS_RECHECK_DELAY);
             root = getShadowRoot(driver);
-            suggestions = root.findElements(BY_SUGGEST).size();
+            suggestions = root.findElements(suggestSelector).size();
         }
 
         System.out.println(SUGGESTIONS_LABEL + suggestions);
@@ -377,11 +551,12 @@ public class ChatBotPage {
     }
 
     private List<WebElement> waitForVisibleSuggestions(Duration timeout) {
+        By suggestSelector = isIncreffSite() ? BY_INCREFF_SUGGEST : BY_SUGGEST;
         long end = System.currentTimeMillis() + timeout.toMillis();
         while (System.currentTimeMillis() < end) {
             try {
                 SearchContext r = Shadow.getRoot(driver);
-                List<WebElement> list = r.findElements(BY_SUGGEST);
+                List<WebElement> list = r.findElements(suggestSelector);
                 list.removeIf(e -> {
                     try { return !e.isDisplayed() || e.getText().trim().isEmpty(); }
                     catch (Exception ex) { return true; }
@@ -394,9 +569,10 @@ public class ChatBotPage {
     }
 
     private String suggestionSignature() {
+        By suggestSelector = isIncreffSite() ? BY_INCREFF_SUGGEST : BY_SUGGEST;
         try {
             SearchContext r = Shadow.getRoot(driver);
-            List<WebElement> list = r.findElements(BY_SUGGEST);
+            List<WebElement> list = r.findElements(suggestSelector);
             StringBuilder sb = new StringBuilder();
             for (WebElement e : list) {
                 try {
