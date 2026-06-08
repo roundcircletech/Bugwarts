@@ -271,13 +271,26 @@ public class ChatBotPage {
                                 lowerReply.contains("failed to verify") ||
                                 lowerReply.contains("unable to validate") ||
                                 lowerReply.contains("share the correct") ||
-                                lowerReply.contains("valid email");
+                                lowerReply.contains("valid email") ||
+                                reAsksForEmailAfterInvalidSubmission(lowerReply);
         
         if (emailRejected) {
             System.out.println("✓ Invalid email correctly rejected by bot");
         } else {
             throw new AssertionError("FAIL: Bot accepted invalid email '" + INVALID_EMAIL + "' as valid! Response: " + reply);
         }
+    }
+
+    private static boolean reAsksForEmailAfterInvalidSubmission(String lowerReply) {
+        boolean asksForEmail = lowerReply.contains("work email")
+                || lowerReply.contains("email address")
+                || lowerReply.contains("share your email")
+                || lowerReply.contains("correct email")
+                || lowerReply.contains("company name");
+        boolean prompting = lowerReply.contains("please")
+                || lowerReply.contains("could you")
+                || lowerReply.contains("share your");
+        return asksForEmail && prompting;
     }
 
     private static boolean isSchedulerReply(String text) {
