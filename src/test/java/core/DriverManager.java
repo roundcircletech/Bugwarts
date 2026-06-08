@@ -1,15 +1,19 @@
 package core;
 
+import java.net.URL;
 import java.time.Duration;
 
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 import static constants.Strings.BROWSER_PROPERTY;
 import static constants.Strings.CHROME;
+import static constants.Strings.SELENIUM_GRID_URL_PROPERTY;
 import static constants.Strings.CHROME_DISABLE_AUTOMATION;
 import static constants.Strings.CHROME_DISABLE_GPU;
 import static constants.Strings.CHROME_OPTION_DISABLE_SHM;
@@ -48,17 +52,17 @@ public class DriverManager {
                     chromeOptions.setExperimentalOption("useAutomationExtension", false);
                     
                     chromeOptions.setAcceptInsecureCerts(true);
-                    driver = new ChromeDriver(chromeOptions);
+                    driver = createDriver(chromeOptions);
                     break;
 
                 case FIREFOX:
                 default:
-                    FirefoxOptions options = new FirefoxOptions();
-                    
-                    options.addArguments(FIREFOX_OPTION_HEADLESS);
-                    options.addArguments(FIREFOX_OPTION_WIDTH, FIREFOX_OPTION_HEIGHT);
-                    options.setAcceptInsecureCerts(true);
-                    driver = new FirefoxDriver(options);
+                    FirefoxOptions firefoxOptions = new FirefoxOptions();
+
+                    firefoxOptions.addArguments(FIREFOX_OPTION_HEADLESS);
+                    firefoxOptions.addArguments(FIREFOX_OPTION_WIDTH, FIREFOX_OPTION_HEIGHT);
+                    firefoxOptions.setAcceptInsecureCerts(true);
+                    driver = createDriver(firefoxOptions);
                     break;
             }
             driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(DEFAULT_TIMEOUT));
@@ -70,6 +74,26 @@ public class DriverManager {
         if (driver != null) {
             driver.quit();
             driver = null;
+        }
+    }
+
+    private static WebDriver createDriver(ChromeOptions options) {
+        return connect(options, () -> new ChromeDriver(options));
+    }
+
+    private static WebDriver createDriver(FirefoxOptions options) {
+        return connect(options, () -> new FirefoxDriver(options));
+    }
+
+    private static WebDriver connect(Capabilities options, java.util.function.Supplier<WebDriver> localDriver) {
+        String gridUrl = System.getProperty(SELENIUM_GRID_URL_PROPERTY);
+        if (gridUrl == null || gridUrl.isBlank()) {
+            return localDriver.get();
+        }
+        try {
+            return new RemoteWebDriver(new URL(gridUrl), options);
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to connect to Selenium grid at " + gridUrl, e);
         }
     }
 }

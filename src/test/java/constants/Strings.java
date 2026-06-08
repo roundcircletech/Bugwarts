@@ -8,6 +8,7 @@ public class Strings {
     public static final String CHROME = "chrome";
     public static final String FIREFOX = "firefox";
     public static final String BROWSER_PROPERTY = "browser";
+    public static final String SELENIUM_GRID_URL_PROPERTY = "selenium.grid.url";
     
     // Test data
     public static final String GREETING_MSG = "Hi Agent, I am Avishi!";
