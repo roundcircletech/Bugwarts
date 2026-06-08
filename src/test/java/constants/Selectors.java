@@ -23,9 +23,23 @@ public class Selectors {
     public static final String COOKIE_DECLINE_XPATH = "//div[contains(text(),'Decline')]";
     public static final String COOKIE_ALLOW_XPATH = "//div[contains(text(),'Allow Cookies')]";
     
+    // Increff Design 2 (floating bar) — used only for increff.com
+    public static final String INCREFF_FLOATING_BAR_INPUT = "input[aria-label='Open chat to type']";
+    public static final String INCREFF_FLOATING_BAR_OPEN = "div[role='button'][aria-label='Open chat to type']";
+    public static final String INCREFF_CHAT_INPUT = "textarea[aria-label='Chat input']";
+    public static final String INCREFF_SEND_BUTTON = "button[class*='sdkSendButton']";
+    public static final String INCREFF_CALENDAR_BUTTON = "button[class*='sdkCalendarButton']";
+    public static final String INCREFF_EXPAND_BUTTON = "button[class*='sdkExpandButton']";
+    public static final String INCREFF_CLOSE_BUTTON =
+            "button[class*='closeBtn'], button[class*='sdkCloseButton']";
+    public static final String INCREFF_SUGGESTIONS = "h1[class*='suggestiveResponse'], div[class*='suggestiveResponse']";
+    public static final String INCREFF_SUGGESTED_QUESTIONS_CONTAINER =
+            "div[class*='sdkSuggestedQuestionsContainer'] button";
+    public static final String INCREFF_COOKIE_REJECT_XPATH = "//button[contains(.,'Reject All')]";
+    public static final String INCREFF_COOKIE_ACCEPT_XPATH = "//button[contains(.,'Accept All')]";
+    
     // JavaScript scroll
     public static final String JS_SCROLL_INTO_VIEW = "arguments[0].scrollIntoView({block:'center'});";
     public static final String JS_CLICK = "arguments[0].click();";
     public static final String JS_GET_TEXT = "return arguments[0].innerText || arguments[0].textContent || '';";
 }
-
