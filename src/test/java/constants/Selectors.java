@@ -4,15 +4,15 @@ public class Selectors {
     // Shadow DOM
     public static final String HOST_COMPONENT = "my-component";
     
-    // Chat elements
-    public static final String CHAT_BUTTON = "button.ChatButton-module_sdkChatButton__M1mKI";
+    // Chat elements — use partial class match; CSS module hashes change on SDK rebuild
+    public static final String CHAT_BUTTON = "button[class*='sdkChatButton']";
     public static final String CHAT_INPUT = "textarea[role='textbox'][aria-label='Chat input']";
-    public static final String SEND_BUTTON = "button.ChatInputBox-module_sdkSendButton__CLWm6";
-    public static final String CALENDAR_BUTTON = "button.ChatInputBox-module_sdkCalendarButton__r3Rt3";
+    public static final String SEND_BUTTON = "button[class*='sdkSendButton']";
+    public static final String CALENDAR_BUTTON = "button[class*='sdkCalendarButton']";
     
     // Header buttons
-    public static final String EXPAND_BUTTON = "button.ChatHeader-module_sdkExpandButton__qtONk";
-    public static final String CLOSE_BUTTON = "button.ChatHeader-module_sdkCloseButton__AQvQv";
+    public static final String EXPAND_BUTTON = "button[class*='sdkExpandButton']";
+    public static final String CLOSE_BUTTON = "button[class*='sdkCloseButton']";
     
     // Content
     public static final String AGENT_TEXT = "div[class*='AiText-module_textContainer']";
