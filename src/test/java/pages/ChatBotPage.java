@@ -536,7 +536,14 @@ public class ChatBotPage {
             chatInput.click();
             chatInput.sendKeys(msg);
 
-            root.findElement(sendSelector).click();
+            WebDriverWait sendWait = new WebDriverWait(driver, Duration.ofSeconds(SHADOW_ROOT_TIMEOUT));
+            sendWait.ignoring(NoSuchElementException.class)
+                    .ignoring(StaleElementReferenceException.class)
+                    .until(d -> {
+                        SearchContext r = getShadowRoot(driver);
+                        List<WebElement> sends = r.findElements(sendSelector);
+                        return !sends.isEmpty() && sends.get(0).isDisplayed() ? sends.get(0) : null;
+                    }).click();
 
             safeSleep(AFTER_SEND_DELAY);
             reply = waitAndGetNewAgentReply(driver, before, Duration.ofSeconds(SHADOW_ROOT_TIMEOUT));
