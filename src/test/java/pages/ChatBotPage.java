@@ -272,6 +272,7 @@ public class ChatBotPage {
                                 lowerReply.contains("unable to validate") ||
                                 lowerReply.contains("share the correct") ||
                                 lowerReply.contains("valid email") ||
+                                lowerReply.contains("may I have your email address?") ||
                                 reAsksForEmailAfterInvalidSubmission(lowerReply);
         
         if (emailRejected) {
